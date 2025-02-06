@@ -10,7 +10,7 @@ const PremiumLanding = () => {
 
   const { authCard, toggleAuthCard } = useContext(AuthToggle);
   // Using a premium black and white image
-  const bgImageUrl: string = "https://www.masaischool.com/blog/content/images/2023/03/Scholarship-distribution-3.JPG";
+  const bgImageUrl = "https://www.masaischool.com/blog/content/images/2023/03/Scholarship-distribution-3.JPG";
 
   useEffect(() => {
     const img = new Image();
