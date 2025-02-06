@@ -13,7 +13,7 @@ export default function AuthCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const { authCard, toggleAuthCard } = useContext(AuthToggle);
+  const {toggleAuthCard } = useContext(AuthToggle);
   const router = useRouter();
   const [progress, setProgress] = useState(0);
 
