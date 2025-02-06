@@ -1,9 +1,14 @@
 "use client"
 import { useState, useEffect } from 'react';
+import  AuthCard from "../components/authScreen/AuthCard"
+import { AuthToggle } from '../components/authScreen/context/authContext';
+import Link from 'next/link';
+import { useContext } from 'react';
 const PremiumLanding = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  
+
+  const { authCard, toggleAuthCard } = useContext(AuthToggle);
   // Using a premium black and white image
   const bgImageUrl: string = "https://www.masaischool.com/blog/content/images/2023/03/Scholarship-distribution-3.JPG";
 
@@ -16,15 +21,16 @@ const PremiumLanding = () => {
   }, [bgImageUrl]);
 
   return (
+    <>
+    {authCard && <AuthCard/>}
     <div className="relative min-h-screen bg-black">
       {/* Navbar */}
       <nav className="absolute top-0 z-50 w-full px-8 py-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <span className="text-white text-xl font-light tracking-[0.2em]">LEVEL UP</span>
-          <button className="px-6 py-2 text-sm text-white border border-white/20 rounded-full 
-            hover:bg-white hover:text-black transition-all duration-300">
-            Sign In
-          </button>
+          <Link href="/">
+          <span className="text-white text-xl font-light tracking-[0.2em]">MASAI CONNECT</span>
+          </Link>
+          
         </div>
       </nav>
 
@@ -59,18 +65,18 @@ const PremiumLanding = () => {
             className="inline-block group"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-          >
-            <button className={`
+            >
+            <button onClick={toggleAuthCard} className={`
               relative overflow-hidden px-12 py-5 bg-white text-black 
               rounded-full font-medium text-lg transition-all duration-500
               hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]
               ${isHovered ? 'tracking-widest' : 'tracking-wide'}
-            `}>
+              `}>
               <span className="relative z-10">BEGIN YOUR JOURNEY</span>
               <div className={`
                 absolute inset-0 bg-black transition-transform duration-500
                 ${isHovered ? 'translate-y-0' : 'translate-y-full'}
-              `}/>
+                `}/>
               <span className={`
                 absolute inset-1 flex items-center justify-center text-white 
                 ${isHovered ? 'translate-y-0' : 'translate-y-full'}
@@ -87,6 +93,7 @@ const PremiumLanding = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] 
         bg-[radial-gradient(circle,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:30px_30px]" />
     </div>
+        </>
   );
 };
 
