@@ -9,21 +9,14 @@ const dummyNotifications:Notification[] = [
     id:1,
     title:"Industry Expose Sessions with Deepinder Goyal",
     description:"CEO ZOMATO",
-    date:"Date",
+    date:"12 PM TODAY  AT MASAI",
     link:"Link"
   },
   {
     id:2,
-    title:"Title",
-    description:"Description",
-    date:"Date",
-    link:"Link"
-  },
-  {
-    id:3,
-    title:"Title",
-    description:"Description",
-    date:"Date",
+    title:"Construct Week Winners",
+    description:"Top teams after the Level 1 presentation will be participating in the Final Construct Week presentation of Block 41 on",
+    date:"11th January at 1:30 PM.",
     link:"Link"
   }
 ]

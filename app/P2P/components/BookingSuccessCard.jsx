@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation'; // or 'next/router' if using Pages Router
 
-const BookingSuccessCard = ({ onClose, bookingDetails }) => {
+const BookingSuccessCard = ({ onClose, bookingDetails, typeOfSession, topic, time }) => {
   const router = useRouter();
   const [countdown, setCountdown] = useState(5);
 
@@ -15,19 +15,21 @@ const BookingSuccessCard = ({ onClose, bookingDetails }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Redirect when countdown reaches zero
-  useEffect(() => {
-    if (countdown <= 0) {
-      // Close the modal (unmount it)
-      onClose && onClose();
-      // Navigate to the Dashboard page
-      router.push('/Dashboard');
-    }
-  }, [countdown, router, onClose]);
+  
+// Redirect when countdown reaches zero
+useEffect(() => {
+  if (countdown <= 0) {
+    // Close the modal (unmount it)
+    onClose && onClose();
+    // Navigate to the Dashboard page
+    router.push('/Dashboard');
+  }
+}, [countdown, router, onClose]);
+
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8 z-[1000]">
-      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md mx-auto text-center space-y-4 relative">
+    <div className=" fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8 z-[1000]">
+      <div className="bg-[#e2ebfc] rounded-lg shadow-2xl p-8 w-full max-w-md mx-auto text-center space-y-4 relative">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 text-xl font-bold"
@@ -51,12 +53,12 @@ const BookingSuccessCard = ({ onClose, bookingDetails }) => {
         />
 
         <h2 className="text-2xl font-bold text-black">Booking Successful!</h2>
-        <p className="text-gray-600">Your peer programming session has been scheduled.</p>
+        <p className="text-gray-600">Your {typeOfSession} session has been scheduled.</p>
         
-        <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2">
+        <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2 text-black">
           <p><span className="font-medium">Date:</span> {bookingDetails?.schedule?.date}</p>
-          <p><span className="font-medium">Time:</span> {bookingDetails?.schedule?.time}</p>
-          <p><span className="font-medium">Topic:</span> {bookingDetails?.topic?.type}</p>
+          <p><span className="font-medium">Time: {time}</span> {bookingDetails?.schedule?.time}</p>
+          <p><span className="font-medium">Topic: {topic}</span> {bookingDetails?.topic?.type}</p>
           {bookingDetails?.group_or_solo === 'group' && (
             <p><span className="font-medium">Group Size:</span> {bookingDetails?.group_members?.length + 1} members</p>
           )}

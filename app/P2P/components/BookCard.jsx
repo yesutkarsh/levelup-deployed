@@ -246,7 +246,7 @@ const EnhancedBookingCard = ({ onClose }) => {
 
           {/* Session Type Tabs */}
           <div className="mb-6">
-            <div className="bg-black-300  text-white text-black flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <div className="bg-[#ebf5ff]  text-white text-black flex space-x-1 bg-gray-100 p-1 rounded-lg">
               {SESSION_TYPES.map((type) => (
                 <button
                   key={type.id}
@@ -256,8 +256,8 @@ const EnhancedBookingCard = ({ onClose }) => {
                   }}
                   className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeTab === type.id
-                      ? 'bg-[black]  text-white shadow'
-                      : 'text-gray-600 hover:text-black'
+                      ? 'bg-[#e1effe]  text-[#2a62de] border-[1px] border-[#2a62de] font-semibold '
+                      : 'text-gray-600 hover:text-black font-semibold'
                   }`}
                 >
                   {type.label}
@@ -371,7 +371,7 @@ const EnhancedBookingCard = ({ onClose }) => {
                 value={formData.booking_reason}
                 onChange={handleChange}
                 placeholder="Explain your reasons for booking this session..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 rows={3}
               />
             </div>
@@ -386,7 +386,7 @@ const EnhancedBookingCard = ({ onClose }) => {
                 value={formData.specific_problem}
                 onChange={handleChange}
                 placeholder="Describe any specific issues or topics you'd like to cover..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 rows={3}
               />
             </div>
@@ -517,7 +517,7 @@ const EnhancedBookingCard = ({ onClose }) => {
   whileHover={{ scale: 1.02 }}
   whileTap={{ scale: 0.98 }}
   type="submit"
-  className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-800 transition duration-300 text-sm mx-auto block w-64"
+  className="bg-[#96afff] text-white py-2 px-6 rounded-lg hover:bg-gray-800 transition duration-300 text-sm mx-auto block w-64"
 >
   Book Session
 </motion.button>
@@ -529,6 +529,9 @@ const EnhancedBookingCard = ({ onClose }) => {
       {showSuccess && (
         <BookingSuccessCard
         key={123}
+        typeOfSession={activeTab}
+        topic={formData.booking_reason}
+        time = {formData.schedule.time}
         onClose={() => {
           setShowSuccess(false);
           onClose();

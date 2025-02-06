@@ -1,6 +1,6 @@
 import React from 'react'
 import BannerCard from '../P2P/components/BannerCard'
-
+import {NewsUpdate} from "../../components/NewsUpdate/NewsUpdate";
 
 
 export default function page():React.ReactElement{
@@ -9,6 +9,7 @@ export default function page():React.ReactElement{
   
     <div>
     <BannerCard/>
+    <NewsUpdate/>
     </div>
     </>
   )
