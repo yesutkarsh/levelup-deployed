@@ -1,0 +1,44 @@
+.container {
+    position: fixed;
+    width: 250px;
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 20px 0;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.option:hover {
+  background-color: #f3f4f6;
+}
+
+.active {
+  background-color: #eef2ff;
+}
+
+.icon {
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+.label {
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.activeLabel {
+  font-weight: 500;
+}
