@@ -296,6 +296,7 @@ export default function MentorDashboard() {
                       Session on {`February ${day}, 2025`}
                     </p>
                     <p className="text-gray-600">Topic: Pear Programming Session</p>
+                    <p className="text-gray-600">Notes: I have doubt in everythign! lamaos </p>
                   </div>
                   <div className="flex items-center space-x-3">
                   <button
