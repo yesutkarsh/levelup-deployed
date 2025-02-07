@@ -1,68 +1,111 @@
 "use client";
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, User, LogOut } from 'lucide-react';
-import Link from 'next/link';
-import Sidepanel, { Notification } from "../../components/SidePanel/Sidepanel";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Menu,
+  User,
+  LogOut,
+  Home,
+  Info,
+  Calendar,
+  UserCircle,
+  X,
+} from "lucide-react";
+import Link from "next/link";
 
-const dummyNotifications: Notification[] = [/* ... */];
+// Create an animated Link component using Framer Motion
+const MotionLink = motion(Link);
 
-export default function Navbar(): React.ReactElement {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  const toggleMenu = () => setIsOpen(!isOpen);
-
+// Redesigned Side Panel Component
+function SidePanel({ onClose }): React.ReactElement {
   return (
-    <>
-      <nav className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-50">
-        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-          {/* Hamburger Button */}
+    <motion.div
+      initial={{ x: "-100%" }}
+      animate={{ x: 0 }}
+      exit={{ x: "-100%" }}
+      transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50"
+    >
+      <div className="p-4 border-b">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={toggleMenu}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100"
           >
-            <Menu className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+            <X className="w-5 h-5 text-gray-700" />
           </motion.button>
+        </div>
+      </div>
+      <nav className="p-4 space-y-2">
+        <MotionLink
+          href="/Dashboard"
+          whileHover={{ scale: 1.02 }}
+          className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+        >
+          <Home className="w-5 h-5 mr-2" />
+          Dashboard
+        </MotionLink>
+        <MotionLink
+          href="/about"
+          whileHover={{ scale: 1.02 }}
+          className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+        >
+          <Info className="w-5 h-5 mr-2" />
+          About
+        </MotionLink>
+        {/* Add more side panel links as needed */}
+      </nav>
+    </motion.div>
+  );
+}
 
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center"
+export default function Navbar() {
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const toggleMenu = () => setIsSidePanelOpen(!isSidePanelOpen);
+  const closeMenu = () => setIsSidePanelOpen(false);
+
+  return (
+    <>
+      {/* Top Navbar */}
+      <nav className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-50 flex items-center px-4 justify-between">
+        {/* Hamburger Button */}
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={toggleMenu}
+          className="p-2 rounded-lg hover:bg-gray-100 transition"
+        >
+          <Menu className="w-6 h-6 text-gray-700" />
+        </motion.button>
+
+        {/* Logo */}
+        <MotionLink href="/" className="text-xl font-bold text-black">
+          MASAI CONNECT
+        </MotionLink>
+
+        {/* Profile & Logout */}
+        <div className="flex items-center space-x-2">
+          <MotionLink
+            href="/profile"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
           >
-            <Link href="/">
-              <span className="text-xl font-bold bg-clip-text text-black dark:text-white">
-                MASAI CONNECT
-              </span>
-            </Link>
-          </motion.div>
-
-          {/* Combined Profile & Logout Card */}
-          <div className="flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <Link href="/profile">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-l hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <User className="w-6 h-6 text-gray-700 dark:text-gray-200" />
-              </motion.button>
-            </Link>
-            
-            <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-            
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setShowLogoutModal(true)}
-              className="p-2 rounded-r hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <LogOut className="w-6 h-6 text-gray-700 dark:text-gray-200" />
-            </motion.button>
-          </div>
+            <User className="w-6 h-6 text-gray-700" />
+          </MotionLink>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setShowLogoutModal(true)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+          >
+            <LogOut className="w-6 h-6 text-gray-700" />
+          </motion.button>
         </div>
       </nav>
 
@@ -77,49 +120,53 @@ export default function Navbar(): React.ReactElement {
             onClick={() => setShowLogoutModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4"
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-white rounded-lg p-6 max-w-sm w-full mx-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">Confirm Logout</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to logout?</p>
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                Confirm Logout
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to logout?
+              </p>
               <div className="flex justify-end gap-4">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition"
                   onClick={() => setShowLogoutModal(false)}
                 >
                   Cancel
                 </motion.button>
-                <Link href="/">
-                <motion.button
+                <MotionLink
+                  href="/"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
                   onClick={() => {
-                      // Handle actual logout here
-                      setShowLogoutModal(false);
-                    }}
-                    >
+                    // Insert actual logout logic here if needed
+                    setShowLogoutModal(false);
+                  }}
+                >
                   Logout
-                </motion.button>
-                    </Link>
+                </MotionLink>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Backdrop */}
+
+      {/* Side Panel Backdrop */}
       <AnimatePresence>
-        {isOpen && (
+        {isSidePanelOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={toggleMenu}
+            onClick={closeMenu}
             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           />
         )}
@@ -127,24 +174,36 @@ export default function Navbar(): React.ReactElement {
 
       {/* Side Panel */}
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 20 }}
-            className="fixed top-0 left-0 z-50"
-          >
-            <Sidepanel 
-              event={1} 
-              news={2} 
-              updates={3} 
-              weekTrends={4} 
-              notifications={dummyNotifications}
-            />
-          </motion.div>
-        )}
+        {isSidePanelOpen && <SidePanel onClose={closeMenu} />}
       </AnimatePresence>
+
+      {/* Bottom Navbar (Mobile Only) */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-md flex justify-around py-2 md:hidden z-50">
+        <MotionLink
+          href="/Dashboard"
+          className="flex flex-col items-center text-gray-700"
+          whileHover={{ scale: 1.05 }}
+        >
+          <Home className="w-6 h-6" />
+          <span className="text-xs">Dashboard</span>
+        </MotionLink>
+        <MotionLink
+          href="/Booksession"
+          className="flex flex-col items-center text-gray-700"
+          whileHover={{ scale: 1.05 }}
+        >
+          <Calendar className="w-6 h-6" />
+          <span className="text-xs">Book Session</span>
+        </MotionLink>
+        <MotionLink
+          href="/profile"
+          className="flex flex-col items-center text-gray-700"
+          whileHover={{ scale: 1.05 }}
+        >
+          <UserCircle className="w-6 h-6" />
+          <span className="text-xs">Profile</span>
+        </MotionLink>
+      </div>
     </>
   );
 }
