@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Script from 'next/script';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // or 'next/router' if using Pages Router
 
-const BookingSuccessCard = ({ onClose, bookingDetails, typeOfSession, topic, time }) => {
-  const router = useRouter();
+const Success = ({ onClose, bookingDetails, typeOfSession, date, time }) => {
   const [countdown, setCountdown] = useState(5);
+  const router = useRouter();
 
   // Countdown state update
   useEffect(() => {
@@ -17,25 +18,27 @@ const BookingSuccessCard = ({ onClose, bookingDetails, typeOfSession, topic, tim
 
   
 // Redirect when countdown reaches zero
-// useEffect(() => {
-//   if (countdown <= 0) {
-//     // Close the modal (unmount it)
-//     onClose && onClose();
-//     // Navigate to the Dashboard page
-//     router.push('/Dashboard');
-//   }
-// }, [countdown, router, onClose]);
+useEffect(() => {
+  if (countdown <= 0) {
+    // Close the modal (unmount it)
+    onClose && onClose();
+    // Navigate to the Dashboard page
+    router.push('/Dashboard');
+  }
+}, [countdown, router, onClose]);
 
 
   return (
     <div className=" fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8 z-[1000]">
       <div className="bg-[#e2ebfc] rounded-lg shadow-2xl p-8 w-full max-w-md mx-auto text-center space-y-4 relative">
+<Link href="/Dashboard">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 text-xl font-bold"
-        >
+          >
           ×
         </button>
+            </Link>
 
         <Script 
           src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" 
@@ -58,7 +61,7 @@ const BookingSuccessCard = ({ onClose, bookingDetails, typeOfSession, topic, tim
         <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2 text-black">
           <p><span className="font-medium">Date:</span> {bookingDetails?.schedule?.date}</p>
           <p><span className="font-medium">Time: {time}</span> {bookingDetails?.schedule?.time}</p>
-          <p><span className="font-medium">Topic: {topic}</span> {bookingDetails?.topic?.type}</p>
+          {/* <p><span className="font-medium">Topic: {topic}</span> {bookingDetails?.topic?.type}</p> */}
           {bookingDetails?.group_or_solo === 'group' && (
             <p><span className="font-medium">Group Size:</span> {bookingDetails?.group_members?.length + 1} members</p>
           )}
@@ -68,15 +71,17 @@ const BookingSuccessCard = ({ onClose, bookingDetails, typeOfSession, topic, tim
           Redirecting to Dashboard in {countdown > 0 ? countdown : 0} second{countdown !== 1 && 's'}...
         </p>
 
+<Link href="/Dashboard">
         <button
           onClick={onClose}
           className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300"
-        >
+          >
           Close
         </button>
+            </Link>
       </div>
     </div>
   );
 };
 
-export default BookingSuccessCard;
+export default Success;

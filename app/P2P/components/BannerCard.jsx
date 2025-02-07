@@ -1,7 +1,8 @@
 "use client";
 import React from 'react';
 import styles from './banner.module.css';
-import PeerProgrammingBookingCard from '../components/BookCard';
+import Link from 'next/link';
+// import PeerProgrammingBookingCard from '../components/BookCard';
 
 export default function BannerCard() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -15,9 +16,11 @@ export default function BannerCard() {
         <div>
           <h1>Book Pair Programming Sessions!</h1>
           <p>Book a session with a mentor and get your doubts cleared</p>
-          <button onClick={() => setIsOpen(!isOpen)}>
+         <Link href="/Booksession">
+          <button>
             Schedule Now <i className="ri-arrow-right-line"></i>
           </button>
+         </Link>
         </div>
         <div>
           <img 
