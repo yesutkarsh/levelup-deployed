@@ -51,7 +51,7 @@ export default function AuthCard() {
   useEffect(() => {
     if (isRedirecting) {
       const timer = setTimeout(() => {
-        router.push("/Dashboard");
+        router.push("/StudentDashboard");
         toggleAuthCard();
       }, 2500);
       return () => clearTimeout(timer);

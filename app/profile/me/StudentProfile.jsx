@@ -222,6 +222,16 @@ const StudentProfile = () => {
   const suggestionItemClass =
     "cursor-pointer px-3 py-2 hover:bg-gray-200 dark:hover:bg-gray-600";
 
+
+    const courses = [
+      { id: 1, title: "Introduction to Web Development", type: "previous" },
+      { id: 2, title: "Advanced Next.js", type: "current" },
+    ];
+
+    
+  const currentCourses = courses.filter((course) => course.type === "current");
+  const previousCourses = courses.filter((course) => course.type === "previous");
+
   return (
     <div
       className="container mx-auto p-6 bg-gray-50 dark:bg-gray-900"
@@ -229,29 +239,44 @@ const StudentProfile = () => {
         width: '100vw',
         backgroundColor: 'white',
         minHeight: '100vh',
+        overflow: 'hidden',
+        
       }}
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-0">
-          Student Profile
-        </h1>
-        <div className="flex space-x-2 md:space-x-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
-              className={`px-4 py-2 rounded-t-md transition-colors duration-300 ${
+      <div className="flex flex-col space-y-6 w-full">
+  <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+    Student Profile
+  </h1>
+  
+  <div className="relative w-full">
+    <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+      <div className="flex space-x-2 pb-2">
+        {tabs.map((tab) => (
+          <button
+          style={{
+            borderRadius: "10px 10px 0px 0px",
+          }}
+            key={tab.id}
+            onClick={() => handleTabClick(tab.id)}
+            className={`
+              whitespace-nowrap px-4 py-2.5  text-sm font-medium
+              transition-all duration-200 ease-in-out 
+              ${
                 activeTab === tab.id
-                  ? 'bg-black text-white'
-                  : 'bg-black text-white opacity-70 hover:opacity-90'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+                  ? 'bg-gray-900 text-white shadow-lg dark:bg-white dark:text-gray-900'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+              }
+            `}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
+    </div>
+    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700" />
+  </div>
+</div>
 
       {/* Profile Section */}
       <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
@@ -276,7 +301,7 @@ const StudentProfile = () => {
           </label>
         </div>
         {/* Name and Student ID */}
-        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full md:w-auto">
+        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg  w-full md:w-auto">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             John Doe
           </h2>
@@ -867,6 +892,75 @@ const StudentProfile = () => {
           </div>
         </div>
       )}
+<br />
+<br />
+<br />
+
+<div className="bg-white shadow-lg rounded-xl p-6">
+              <h2 className="text-xl font-semibold mb-4">Courses</h2>
+              <div className="mb-4 border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8">
+                  <button
+                    onClick={() => setActiveTab("current")}
+                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition ${
+                      activeTab === "current"
+                        ? "border-black bg-black text-white p-2 rounded-lg m-2"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Current Course
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("previous")}
+                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition ${
+                      activeTab === "previous"
+                        ? "border-black bg-black text-white p-2 rounded-lg m-2"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Previous Course
+                  </button>
+                </nav>
+              </div>
+              <div>
+                {activeTab === "current" && (
+                  <div className="space-y-4">
+                    {currentCourses.length > 0 ? (
+                      currentCourses.map((course) => (
+                        <div
+                          key={course.id}
+                          className="p-4 border rounded-lg flex items-center justify-between hover:shadow-md transition transform hover:-translate-y-1"
+                        >
+                          <p className="font-medium">{course.title}</p>
+                          <span className="text-green-500 border border-green-500 px-2 py-1 rounded-full text-xs">
+                            Active
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No current courses.</p>
+                    )}
+                  </div>
+                )}
+                {activeTab === "previous" && (
+                  <div className="space-y-4">
+                    {previousCourses.length > 0 ? (
+                      previousCourses.map((course) => (
+                        <div
+                          key={course.id}
+                          className="p-4 border rounded-lg opacity-50 flex items-center"
+                        >
+                          <p className="font-medium">{course.title}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No previous courses.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
     </div>
   );
 };

@@ -1,10 +1,10 @@
 import React from 'react'
-import ProfilePage from "./ProfilePage"
+import StudentProfile from './me/StudentProfile'
 
 export default function page() {
   return (
     <>
-    <ProfilePage/>
+    <StudentProfile/>
     </>
   )
 }

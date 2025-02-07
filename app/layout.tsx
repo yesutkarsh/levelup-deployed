@@ -2,9 +2,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthToggleProvider } from "@/components/authScreen/context/authContext";
-import NextTopLoader from 'nextjs-toploader';
+import NextTopLoader from "nextjs-toploader";
 import Navbar from "@/components/Navbar/Navbar";
 import { usePathname } from "next/navigation";
+import { ProfileProvider } from "@/context/ProfileContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,24 +33,23 @@ export default function RootLayout({
             rel="stylesheet"
           />
         </head>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <NextTopLoader height={5} />
 
-        <NextTopLoader 
-        
-        height={5}
-        />
-          {pathname !== "/" && 
-          <>
-          <Navbar />
-          <br />
-          <br />
-          <br />
-          </>
-          
-          }
-          
-          
-          {children}
+          <ProfileProvider>
+            {pathname !== "/" && (
+              <>
+                <Navbar />
+                <br />
+                <br />
+                <br />
+              </>
+            )}
+
+            {children}
+          </ProfileProvider>
         </body>
       </AuthToggleProvider>
     </html>
