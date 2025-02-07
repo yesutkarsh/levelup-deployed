@@ -85,12 +85,12 @@ const SessionDetails = () => {
     <div className="bg-gray-50 min-h-screen">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <SideBar />
+        {/* <SideBar /> */}
 
         {/* Main Content */}
         <div className="flex-1">
           {/* Header */}
-          <Header title="Session Details" />
+          {/* <Header title="Session Details" /> */}
 
           {/* Main Content */}
           <main className="p-8 relative">

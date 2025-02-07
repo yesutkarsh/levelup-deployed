@@ -7,10 +7,10 @@ const Sessions = () => {
     <div className="bg-gray-50 min-h-screen">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <SideBar/>
+        {/* <SideBar/> */}
         {/* Main Content */}
         <div className="flex-1">
-          <Header/>
+          {/* <Header/> */}
 
           <main className="p-8">
             <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">

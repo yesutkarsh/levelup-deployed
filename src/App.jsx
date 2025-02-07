@@ -6,15 +6,16 @@ import Dashboard from './Components/Dashboard'
 import Session from './Components/Sessions'
 import CreateSession from './Components/CreateSession'
 import SessionDetails from './Components/SessionDetails'
+import SideBar from './Components/SideBar'
 
 function App() {
 
   return (
     <>
-     {/* <Dashboard/> */}
-     {/* <Session/>  */}
-     {/* <CreateSession/>  */}
-     {/* <SessionDetails/> */}
+     <Dashboard/>
+     <Session/> 
+     <CreateSession/> 
+     <SessionDetails/>
     </>
   )
 }

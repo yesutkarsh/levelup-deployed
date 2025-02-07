@@ -1,52 +1,118 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaChartLine, FaCalendarAlt, FaBullhorn, FaNewspaper, FaChartBar, FaBell } from "react-icons/fa";
 import SideBar from "./SideBar";
 import Header from "./Header";
 
 const CreateSession = () => {
+  const [formData, setFormData] = useState({
+    courseName: "",
+    batch: "",
+    subject: "",
+    date: "",
+    time: "",
+    duration: 45,
+    teacher: "",
+    location: "",
+    sessionNotes: "",
+    resources: null,
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData({
+      ...formData,
+      [name]: files ? files[0] : value,
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      if (!formData[key] && key !== "resources") {
+        newErrors[key] = "This field is required";
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      console.log("Form Data:", formData);
+      // You can add your form submission logic here
+    } else {
+      console.log("Form has errors");
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <SideBar />
+        {/* <SideBar /> */}
 
         {/* Main Content */}
         <div className="flex-1">
           {/* Header */}
-          <Header />
+          {/* <Header /> */}
 
           {/* Main Form */}
           <main className="p-8">
+            <h1>Create Session</h1>
             <div className="mt-0 w-full">
               <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm w-full max-w-5xl mx-auto">
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-2 gap-6">
                     {/* Course Name */}
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700">Course Name</label>
                       <input
                         type="text"
+                        name="courseName"
                         placeholder="Enter course name"
-                        className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.courseName ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
                       />
+                      {errors.courseName && <p className="text-red-500 text-sm mt-1">{errors.courseName}</p>}
                     </div>
 
                     {/* Batch */}
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700">Batch</label>
-                      <select className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom">
+                      <select
+                        name="batch"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.batch ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Batch</option>
                         <option>2024 Spring Semester - Advanced Mathematics</option>
                         <option>2024 Spring Semester - Basic Mathematics</option>
                       </select>
+                      {errors.batch && <p className="text-red-500 text-sm mt-1">{errors.batch}</p>}
                     </div>
 
                     {/* Subject */}
                     <div className="col-span-1">
                       <label className="block text-sm font-medium text-gray-700">Subject</label>
-                      <select className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom">
+                      <select
+                        name="subject"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.subject ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Subject</option>
                         <option>Mathematics</option>
                         <option>Physics</option>
                       </select>
+                      {errors.subject && <p className="text-red-500 text-sm mt-1">{errors.subject}</p>}
                     </div>
 
                     {/* Date */}
@@ -54,8 +120,13 @@ const CreateSession = () => {
                       <label className="block text-sm font-medium text-gray-700">Date</label>
                       <input
                         type="date"
-                        className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom"
+                        name="date"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.date ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
                       />
+                      {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
                     </div>
 
                     {/* Time */}
@@ -63,8 +134,13 @@ const CreateSession = () => {
                       <label className="block text-sm font-medium text-gray-700">Time</label>
                       <input
                         type="time"
-                        className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom"
+                        name="time"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.time ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
                       />
+                      {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time}</p>}
                     </div>
 
                     {/* Duration */}
@@ -72,28 +148,49 @@ const CreateSession = () => {
                       <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
                       <input
                         type="number"
-                        className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom"
+                        name="duration"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.duration ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
                         defaultValue="45"
+                        onChange={handleChange}
                       />
+                      {errors.duration && <p className="text-red-500 text-sm mt-1">{errors.duration}</p>}
                     </div>
 
                     {/* Teacher */}
                     <div className="col-span-1">
                       <label className="block text-sm font-medium text-gray-700">Teacher</label>
-                      <select className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom">
+                      <select
+                        name="teacher"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.teacher ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Teacher</option>
                         <option>Dr. John Smith</option>
                         <option>Dr. Sarah Wilson</option>
                       </select>
+                      {errors.teacher && <p className="text-red-500 text-sm mt-1">{errors.teacher}</p>}
                     </div>
 
                     {/* Location */}
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700">Location</label>
-                      <select className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom">
+                      <select
+                        name="location"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.location ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Location</option>
                         <option>Online (Zoom Meeting)</option>
                         <option>Classroom A1</option>
                         <option>Study Hall</option>
                       </select>
+                      {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
                     </div>
 
                     {/* Session Notes */}
@@ -101,9 +198,14 @@ const CreateSession = () => {
                       <label className="block text-sm font-medium text-gray-700">Session Notes</label>
                       <textarea
                         rows="4"
-                        className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-custom focus:ring-custom"
+                        name="sessionNotes"
+                        className={`mt-1 block w-full rounded-md border ${
+                          errors.sessionNotes ? "border-red-500" : "border-gray-300"
+                        } p-2 shadow-sm focus:border-custom focus:ring-custom`}
                         placeholder="Enter session notes here..."
+                        onChange={handleChange}
                       />
+                      {errors.sessionNotes && <p className="text-red-500 text-sm mt-1">{errors.sessionNotes}</p>}
                     </div>
 
                     {/* Upload Resources */}
@@ -117,7 +219,7 @@ const CreateSession = () => {
                           <div className="flex text-sm text-gray-600">
                             <label className="relative cursor-pointer rounded-md font-medium text-custom hover:text-custom/90">
                               <span>Upload a file</span>
-                              <input type="file" className="sr-only" />
+                              <input type="file" name="resources" className="sr-only" onChange={handleChange} />
                             </label>
                             <p className="pl-1">or drag and drop</p>
                           </div>

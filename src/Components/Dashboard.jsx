@@ -91,7 +91,7 @@ const Dashboard = () => {
     <div className="bg-gray-50 min-h-screen">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <SideBar/>
+        {/* <SideBar/> */}
         {/* Main Content */}
         <div className="flex-1">
           <Header/>
