@@ -13,11 +13,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+type SidePanelProps = {
+  onClose: () => void;
+};
+
 // Create an animated Link component using Framer Motion
 const MotionLink = motion(Link);
 
 // Redesigned Side Panel Component
-function SidePanel({ onClose }): React.ReactElement {
+function SidePanel({ onClose }:SidePanelProps): React.ReactElement {
   return (
     <motion.div
       initial={{ x: "-100%" }}
