@@ -1,6 +1,10 @@
+@import 'react-calendar/dist/Calendar.css';
+@import 'react-datepicker/dist/react-datepicker.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /* :root {
   --background: #ffffff;

@@ -3,7 +3,7 @@ import React from 'react';
 export const NewsUpdate = () => {
   return (
     <div className="w-full px-4 py-8 ">
-      <h2 className="text-3xl font-semibold mb-6 text-gray-900 dark:text-white">News & Update</h2>
+      {/* <h2 className="text-3xl font-semibold mb-6 text-gray-900 dark:text-white">Upcoming Mentor Connect</h2> */}
 {/* 
       <div className="overflow-hidden relative w-full">
         <div className="flex space-x-4 w-full">
@@ -57,7 +57,7 @@ export const NewsUpdate = () => {
       </div> */}
 
       <div className="grid md:grid-cols-2 gap-6 mt-8 bg">
-        <div className="bg-[#ffffff] p-4 rounded-lg shadow-lg flex items-center space-x-4 w-[1000px] max-w-[600px] h-[300px] border-gray-200 border-[1px]">
+        <div className="bg-[#e2ebfc] p-4 rounded-lg  flex items-center space-x-4 w-[1000px] max-w-[600px] h-[300px] border-gray-200 border-[1px]">
         <img
   src="https://preview.redd.it/join-us-for-an-ama-with-harkirat-singh-the-4cr-guy-an-iit-v0-sma7ypq5nuad1.jpg?width=1080&format=pjpg&auto=webp&s=74a497dc1f0dc6968760821f97bbc7f3e2a1c718"
   alt="Mentor"

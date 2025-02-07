@@ -1,9 +1,10 @@
 import React from 'react'
-import MentorDashboard from './MentorDashboard'
+import PostSessionInstructor from './PostSessionMentor'
+
 export default function page() {
   return (
     <>
-    <MentorDashboard />
+    <PostSessionInstructor/>
     </>
   )
 }

@@ -10,6 +10,7 @@ const upcomingSessions = [
     title: "Pair Programming with Jane",
     time: "10:00 AM",
     joinable: false,
+    
   },
   {
     id: 2,
@@ -108,6 +109,19 @@ export default function ProfilePage() {
                       <p className="font-medium">{session.title}</p>
                       <p className="text-sm text-gray-500">{session.time}</p>
                     </div>
+                    {!session.joinable&& (<>
+                    <Link href="/Booksession/PostSessionStudent">
+                    <button style={{
+                      backgroundColor: "white",
+                      border: "1px solid #e5e7eb",
+                      boxShadow: "none",
+                      padding: "10px 20px",
+                    }}>
+                      Write Review
+                      <i className="ri-arrow-right-up-line"></i>
+                    </button>
+                      </Link>
+                    </>)}
                     <button
                       disabled={!session.joinable}
                       className={`px-4 py-2 rounded transition ${
@@ -294,6 +308,19 @@ export default function ProfilePage() {
                       <p className="font-medium">{session.title}</p>
                       <p className="text-sm text-gray-500">{session.time}</p>
                     </div>
+                    {!session.joinable&& (<>
+                    <Link href="/Booksession/PostSessionStudent">
+                    <button style={{
+                      backgroundColor: "white",
+                      border: "1px solid #e5e7eb",
+                      boxShadow: "none",
+                      padding: "10px 20px",
+                    }}>
+                      Write Review
+                      <i className="ri-arrow-right-up-line"></i>
+                    </button>
+                      </Link>
+                    </>)}
                     <button
                       disabled={!session.joinable}
                       className={`px-4 py-2 rounded transition ${

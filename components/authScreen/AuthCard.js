@@ -5,6 +5,8 @@ import { AuthToggle } from "./context/authContext";
 import { motion } from "framer-motion";
 
 export default function AuthCard() {
+
+
   // activeTab can be "signin", "signup", or "forgot"
   const [activeTab, setActiveTab] = useState("signin");
   const [name, setName] = useState("");
@@ -50,6 +52,7 @@ export default function AuthCard() {
     if (isRedirecting) {
       const timer = setTimeout(() => {
         router.push("/Dashboard");
+        toggleAuthCard();
       }, 2500);
       return () => clearTimeout(timer);
     }

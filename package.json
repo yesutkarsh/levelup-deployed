@@ -19,6 +19,8 @@
     "next-auth": "^4.24.11",
     "nextjs-toploader": "^3.7.15",
     "react": "^19.0.0",
+    "react-calendar": "^5.1.0",
+    "react-datepicker": "^8.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
