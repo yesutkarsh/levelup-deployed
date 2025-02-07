@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import { useRef } from 'react';
 import { useProfile } from '@/context/ProfileContext';
 
@@ -17,7 +16,7 @@ export default function WelcomeCard() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result as string);
+        setProfileImage(reader.result);
       };
       reader.readAsDataURL(file);
     }

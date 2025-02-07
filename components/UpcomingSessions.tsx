@@ -85,7 +85,7 @@ export default function UpcomingSessions() {
           <div className="flex gap-2">
             <button
               onClick={handleRatingClick}
-              className="bg-yellow-100 text-black px-4 py-2 rounded-lg hover:bg-yellow-200 transition-all duration-200"
+              className="bg-[#fef9c3] text-black px-4 py-2 rounded-lg hover:bg-yellow-200 transition-all duration-200"
             >
               Ratings
             </button>

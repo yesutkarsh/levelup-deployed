@@ -1,7 +1,6 @@
 "use client";
 
 import { Search, Bell } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useProfile } from '@/context/ProfileContext';
@@ -35,13 +34,13 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              {/* <img
+              <img
                 className="h-8 w-auto"
                 src="https://ai-public.creatie.ai/gen_page/logo_placeholder.png"
                 alt="Logo"
                 width={32}
                 height={32}
-              /> */}
+              />
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
@@ -75,7 +74,7 @@ export default function Navbar() {
               <div className="relative">
                 <input
                   type="text"
-                  className="w-96 pl-10 pr-4 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200"
+                  className="w-95 pl-10 pr-4 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200"
                   placeholder="Search courses, resources..."
                   value={searchQuery}
                   onChange={handleSearch}
@@ -117,13 +116,13 @@ export default function Navbar() {
             </button>
             <div className="ml-4 flex items-center">
               <div className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-                {/* <img
+                <img
                   className="h-8 w-8 rounded-full object-cover"
                   src={profileImage}
                   alt="User"
                   width={32}
                   height={32}
-                /> */}
+                />
               </div>
             </div>
           </div>
