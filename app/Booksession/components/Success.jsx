@@ -19,7 +19,7 @@ const Success = ({ onClose, bookingDetails, typeOfSession, date, time }) => {
   
 // Redirect when countdown reaches zero
 useEffect(() => {
-  if (countdown <= 0) {
+  if (countdown <= 1.5) {
     // Close the modal (unmount it)
     onClose && onClose();
     // Navigate to the Dashboard page

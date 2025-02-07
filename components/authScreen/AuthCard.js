@@ -378,43 +378,48 @@ export default function AuthCard() {
             </div>
           )}
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={isRedirecting || (activeTab === "forgot" && isResetSent)}
-            className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center"
-          >
-            {isRedirecting ? (
-              // A simple spinner for sign in/up
-              <svg
-                className="animate-spin h-5 w-5 text-white dark:text-black"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
-              </svg>
-            ) : activeTab === "signin" ? (
-              "Sign In"
-            ) : activeTab === "signup" ? (
-              "Sign Up"
-            ) : (
-              "Send Reset Link"
-            )}
-          </motion.button>
+<motion.button
+  whileHover={{ scale: 1.02 }}
+  whileTap={{ scale: 0.98 }}
+  type="submit"
+  disabled={isRedirecting || (activeTab === "forgot" && isResetSent)}
+  className={`w-full py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center ${
+    activeTab === "forgot" && isResetSent
+      ? "bg-gray-400 dark:bg-gray-600 text-gray-200 dark:text-gray-400 cursor-not-allowed"
+      : "bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100"
+  }`}
+>
+  {isRedirecting ? (
+    // A simple spinner for sign in/up
+    <svg
+      className="animate-spin h-5 w-5 text-white dark:text-black"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      ></path>
+    </svg>
+  ) : activeTab === "signin" ? (
+    "Sign In"
+  ) : activeTab === "signup" ? (
+    "Sign Up"
+  ) : (
+    "Send Reset Link"
+  )}
+</motion.button>
+
         </form>
 
         {/* Forgot Password link (only in Sign In mode) */}

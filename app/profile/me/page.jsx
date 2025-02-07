@@ -1,10 +1,9 @@
 import React from 'react'
-import ProfilePage from "./ProfilePage"
-
+import StudentProfile from './StudentProfile'
 export default function page() {
   return (
-    <>
-    <ProfilePage/>
-    </>
+<>
+<StudentProfile/>
+</>
   )
 }

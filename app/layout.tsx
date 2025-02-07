@@ -2,6 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthToggleProvider } from "@/components/authScreen/context/authContext";
+import NextTopLoader from 'nextjs-toploader';
 import Navbar from "@/components/Navbar/Navbar";
 import { usePathname } from "next/navigation";
 
@@ -32,6 +33,11 @@ export default function RootLayout({
           />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+
+        <NextTopLoader 
+        
+        height={5}
+        />
           {pathname !== "/" && 
           <>
           <Navbar />

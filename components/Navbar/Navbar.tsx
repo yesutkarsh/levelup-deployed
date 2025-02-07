@@ -1,32 +1,17 @@
 "use client";
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, User } from 'lucide-react';
+import { Menu, User, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import Sidepanel, { Notification } from "../../components/SidePanel/Sidepanel";
-const dummyNotifications:Notification[] = [
-  {
-    id:1,
-    title:"Industry Expose Sessions with Deepinder Goyal",
-    description:"CEO ZOMATO",
-    date:"12 PM TODAY  AT MASAI",
-    link:"Link"
-  },
-  {
-    id:2,
-    title:"Construct Week Winners",
-    description:"Top teams after the Level 1 presentation will be participating in the Final Construct Week presentation of Block 41 on",
-    date:"11th January at 1:30 PM.",
-    link:"Link"
-  }
-]
 
-export default function Navbar():React.ReactElement {
+const dummyNotifications: Notification[] = [/* ... */];
+
+export default function Navbar(): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
-  
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
     <>
@@ -49,23 +34,84 @@ export default function Navbar():React.ReactElement {
             className="flex items-center"
           >
             <Link href="/">
-            <span className="text-xl font-bold bg-clip-text text-black dark:text-white">
-              MASAI CONNECT
-            </span>
+              <span className="text-xl font-bold bg-clip-text text-black dark:text-white">
+                MASAI CONNECT
+              </span>
             </Link>
           </motion.div>
 
-          {/* Profile Icon */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <User className="w-6 h-6 text-gray-700 dark:text-gray-200" />
-          </motion.button>
+          {/* Combined Profile & Logout Card */}
+          <div className="flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <Link href="/profile">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-l hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <User className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+              </motion.button>
+            </Link>
+            
+            <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+            
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowLogoutModal(true)}
+              className="p-2 rounded-r hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <LogOut className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+            </motion.button>
+          </div>
         </div>
       </nav>
 
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
+            onClick={() => setShowLogoutModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">Confirm Logout</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to logout?</p>
+              <div className="flex justify-end gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  onClick={() => setShowLogoutModal(false)}
+                >
+                  Cancel
+                </motion.button>
+                <Link href="/">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                  onClick={() => {
+                      // Handle actual logout here
+                      setShowLogoutModal(false);
+                    }}
+                    >
+                  Logout
+                </motion.button>
+                    </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Backdrop */}
       <AnimatePresence>
         {isOpen && (
