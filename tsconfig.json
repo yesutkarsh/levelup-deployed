@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/P2P/components/BannerCard.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/P2P/components/BannerCard.jsx", "app/profile/ProfilePage.jsx", "app/page.jsx", "components/authScreen/context/authContext.js", "app/profile/ProfilePage.jsx", "app/P2P/components/BookCard.jsx"],
   "exclude": ["node_modules"]
 }
