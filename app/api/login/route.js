@@ -37,6 +37,7 @@ export async function POST(request) {
       backendData = await backendResponse.json();
     } catch (err) {
       const text = await backendResponse.text();
+      console.log(err)
       console.error('Error parsing backend JSON:', text);
       return NextResponse.json(
         { error: 'Invalid JSON response from backend', details: text },
