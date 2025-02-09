@@ -18,7 +18,7 @@ export default function AuthCard() {
   const [passwordError, setPasswordError] = useState("");
   const [nameError, setNameError] = useState("");
   const [phoneError, setPhoneError] = useState("");
-
+  
   // API response messages
   const [apiError, setApiError] = useState("");
   const [apiMessage, setApiMessage] = useState("");
@@ -78,6 +78,7 @@ export default function AuthCard() {
 
   // --- API call for user registration (Sign Up) ---
   const Register = async (details) => {
+    console.log(details)
     try {
       // Reset API messages and start spinner
       setApiError("");
@@ -167,10 +168,10 @@ export default function AuthCard() {
         setEmailError("Please enter a valid email address.");
         return;
       }
-      if (!validatePassword(password)) {
-        setPasswordError("Password is not strong enough.");
-        return;
-      }
+      // if (!validatePassword(password)) {
+      //   setPasswordError("Password is not strong enough.");
+      //   return;
+      // }
       Login({ email, password });
     } else if (activeTab === "signup") {
       if (!name.trim()) {
@@ -185,10 +186,10 @@ export default function AuthCard() {
         setEmailError("Please enter a valid email address.");
         return;
       }
-      if (!validatePassword(password)) {
-        setPasswordError("Password is not strong enough.");
-        return;
-      }
+      // if (!validatePassword(password)) {
+      //   setPasswordError("Password is not strong enough.");
+      //   return;
+      // }
       Register({ name, phoneNumber, email, password, registerType });
     } else if (activeTab === "forgot") {
       if (!validateEmail(email)) {

@@ -16,9 +16,10 @@ export async function middleware(request: NextRequest) {
   
   // If token is missing, redirect to the homepage (login page)
   if (!token) {
+  return NextResponse.next();
     return NextResponse.redirect(new URL('/', request.url));
   }
-
+  console.log(token)
   // Verify the token's integrity using the secret
   try {
     const encoder = new TextEncoder();

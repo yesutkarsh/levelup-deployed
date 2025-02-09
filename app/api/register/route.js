@@ -28,10 +28,10 @@ export async function POST(request) {
     formBody.append('name', name);
     formBody.append('email', email);
     formBody.append('password', password);
-    formBody.append('phoneNumber', phoneNumber);
+    formBody.append('phoneNumber', parseInt(phoneNumber));
 
     // Forward the registration request to your backend endpoint
-    const backendResponse = await fetch('http://localhost:3000/api/v1/auth/register', {
+    const backendResponse = await fetch(process.env.BASEURL+'/api/v1/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -48,6 +48,9 @@ export async function POST(request) {
         { status: backendResponse.status }
       );
     }
+
+
+    // conosle.log(backendData)
 
     // Since no tokens are returned on registration, simply return a success message
     return NextResponse.json({ message: 'Successfully Registered' });

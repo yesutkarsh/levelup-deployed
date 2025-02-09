@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { serialize } from 'cookie';
 
 export async function POST(request) {
   // Validate the Content-Type header
@@ -23,13 +24,15 @@ export async function POST(request) {
     }
 
     // Forward the login request to your Node backend
-    const backendResponse = await fetch('http://localhost:3000/api/v1/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    });
+    const backendResponse = await fetch(process.env.BASEURL+'/api/v1/auth/login',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      }
+    );
 
     // Attempt to parse the backend JSON response
     let backendData;
@@ -37,8 +40,7 @@ export async function POST(request) {
       backendData = await backendResponse.json();
     } catch (err) {
       const text = await backendResponse.text();
-      console.log(err)
-      console.error('Error parsing backend JSON:', text);
+      console.error('Error parsing backend JSON:', text, err);
       return NextResponse.json(
         { error: 'Invalid JSON response from backend', details: text },
         { status: 500 }
@@ -53,25 +55,48 @@ export async function POST(request) {
       );
     }
 
-    // Collect the 'set-cookie' headers from the backend response.
-    // Since headers.raw() is unavailable, iterate over the headers.
-    let cookies = [];
+    // Get user details from the response
+    const userDetails = backendData.data || backendData;
+    console.log(userDetails)
+    // Create the response object
+    const response = NextResponse.json({
+      message: backendData.message || 'Login successful',
+      user: userDetails
+    });
+
+    // Collect and set the secure cookies (tokens) from the backend response
+    let secureTokenCookies = [];
     backendResponse.headers.forEach((value, key) => {
       if (key.toLowerCase() === 'set-cookie') {
-        cookies.push(value);
+        secureTokenCookies.push(value);
       }
     });
 
-    // Build the response JSON
-    const response = NextResponse.json({
-      message: backendData.message || 'Login successful',
-      user: backendData.data || backendData
-    });
-
-    // Append the cookies received from the backend to the response
-    cookies.forEach(cookieStr => {
+    // Add the secure token cookies to the response
+    secureTokenCookies.forEach(cookieStr => {
       response.headers.append('Set-Cookie', cookieStr);
     });
+
+    // Set user details in an unencrypted cookie
+    // Remove sensitive information before storing
+    const userForCookie = {
+      id: userDetails.id,
+      name: userDetails.name,
+      email: userDetails.email,
+      role: userDetails.role,
+      "status":userDetails.status
+      // Add any other non-sensitive fields you want to store
+    };
+
+    const userDetailsCookie = serialize('userDetails', JSON.stringify(userForCookie), {
+      path: '/',
+      httpOnly: false, // Allow client-side access
+      secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
+    });
+
+    response.headers.append('Set-Cookie', userDetailsCookie);
 
     return response;
   } catch (error) {

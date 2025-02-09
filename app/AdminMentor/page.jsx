@@ -57,7 +57,7 @@ const renderComponent = (activeOption) => {
   }
 };
 
-export default function Page() {
+export default function page() {
   const [activeOption, setActiveOption] = useState(0);
 
   return (
