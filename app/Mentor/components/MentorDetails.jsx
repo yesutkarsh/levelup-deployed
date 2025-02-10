@@ -132,7 +132,7 @@ export default function MentorDetails() {
 
       console.log(requestBody)
 
-      const response = await fetch('https://5c93-2402-a00-166-1023-4d6d-24c2-49dc-fe9.ngrok-free.app/api/v1/mentor/profile-setup', {
+      const response = await fetch(process.env.BASEURL+'/api/v1/mentor/profile-setup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

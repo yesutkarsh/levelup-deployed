@@ -17,12 +17,12 @@ const SessionCard = ({ logo, title, description }) => {
   );
 };
 
-const Calendar = ({ 
-  onDateSelect, 
-  onTimeSelect, 
-  selectedDate, 
+const Calendar = ({
+  onDateSelect,
+  onTimeSelect,
+  selectedDate,
   selectedTime,
-  availableApiSlots = [] 
+  availableApiSlots = []
 }) => {
   const year = 2024;
   const month = 2;
@@ -101,7 +101,7 @@ const Calendar = ({
       <div className="grid grid-cols-7 gap-1">
         {cells.map((cell, index) => {
           const hasApiSlots = apiSlotsByDate[cell.day]?.length > 0;
-          
+
           if (!cell.currentMonth) {
             return (
               <div key={index} className="p-2 text-gray-400">
@@ -230,6 +230,7 @@ const BookSessionPage = () => {
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState('');
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [mentors, setMentors] = useState([]);
   const [mentorData, setMentorData] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
@@ -259,19 +260,23 @@ const BookSessionPage = () => {
     fetchCourses();
   }, []);
 
-  // Fetch slots when course is selected
+  // Fetch slots (and mentors) when a course is selected
   useEffect(() => {
     const fetchSlots = async () => {
       if (!selectedCourse) return;
 
       try {
-        // Call the internal API route (which proxies the external API)
         const response = await fetch(`/api/slots?course=${encodeURIComponent(selectedCourse)}`);
         const data = await response.json();
         console.log('Slots response:', data);
         if (data.success && data.data && data.data.length > 0) {
-          setAvailableSlots(data.data[0].currentSlots);
-          setMentorData(data.data[0]);
+          // Save the list of mentors so the user can select one.
+          setMentors(data.data);
+          // Reset mentor selection and available slots
+          setMentorData(null);
+          setAvailableSlots([]);
+          setSelectedDate(null);
+          setSelectedTime('');
         }
       } catch (err) {
         console.error('Error fetching slots:', err);
@@ -284,20 +289,19 @@ const BookSessionPage = () => {
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    
+
     try {
       // Get user details from cookie
       const userDetailsCookie = Cookies.get('userDetails');
       const userDetails = userDetailsCookie ? JSON.parse(decodeURIComponent(userDetailsCookie)) : null;
-      
+
       if (!userDetails) {
         setError('User details not found');
         return;
       }
-      
-      // studentId: userDetails.id,
+
       const bookingData = {
-        studentId: '67a92c8c038859d154a38b38',
+        studentId: userDetails.id,
         mentorId: mentorData._id,
         sessionType: "mentor-connect",
         courseId: selectedCourse,
@@ -307,10 +311,9 @@ const BookSessionPage = () => {
         startTime: selectedTime.startTime,
         endTime: selectedTime.endTime
       };
-  
+
       console.log('Sending booking data:', bookingData);
-  
-      // Call the new local API route built with Next.js App Router
+
       const response = await fetch('/api/booksession', {
         method: 'POST',
         headers: {
@@ -318,10 +321,10 @@ const BookSessionPage = () => {
         },
         body: JSON.stringify(bookingData)
       });
-  
+
       const data = await response.json();
       console.log('Booking response:', data);
-  
+
       if (data.success) {
         setSuccess(true);
       } else {
@@ -332,11 +335,10 @@ const BookSessionPage = () => {
       setError('Failed to make booking');
     }
   };
-  
 
   return (
     <>
-    {success && <Success date={"Today"} time={"Today"} />}
+      {success && <Success date={"Today"} time={"Today"} />}
       <div style={{ backgroundColor: "white" }} className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-6">Book Session</h1>
 
@@ -382,7 +384,12 @@ const BookSessionPage = () => {
               </label>
               <select
                 value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCourse(e.target.value);
+                  // Reset mentor and slots when course changes
+                  setMentorData(null);
+                  setAvailableSlots([]);
+                }}
                 className="w-full p-2 border rounded bg-white"
               >
                 <option value="">Select a Course</option>
@@ -393,6 +400,32 @@ const BookSessionPage = () => {
                 ))}
               </select>
             </div>
+
+            {mentors.length > 0 && (
+              <div className="bg-[#f3f4f6] p-6 rounded-lg mb-6">
+                <label className="block text-gray-700 font-medium mb-2">
+                  Select Mentor
+                </label>
+                <select
+                  value={mentorData ? mentorData._id : ""}
+                  onChange={(e) => {
+                    const selectedMentor = mentors.find(m => m._id === e.target.value);
+                    setMentorData(selectedMentor);
+                    setAvailableSlots(selectedMentor.currentSlots);
+                    setSelectedDate(null);
+                    setSelectedTime('');
+                  }}
+                  className="w-full p-2 border rounded bg-white"
+                >
+                  <option value="">Select a Mentor</option>
+                  {mentors.map((mentor) => (
+                    <option key={mentor._id} value={mentor._id}>
+                      {mentor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <Calendar
               onDateSelect={setSelectedDate}
@@ -476,7 +509,7 @@ const BookSessionPage = () => {
 
                 <button
                   type="submit"
-                  disabled={!selectedCourse || !selectedTime}
+                  disabled={!selectedCourse || !selectedTime || !mentorData}
                   className="w-full bg-black text-white p-2 rounded hover:bg-gray-800 disabled:bg-gray-400"
                 >
                   Confirm Booking

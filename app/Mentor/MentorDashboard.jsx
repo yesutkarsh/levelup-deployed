@@ -78,24 +78,41 @@ export default function MentorDashboard() {
     if (!meetingLink) return;
   
     const payload = {
-      sessionId,             // Session id from your fetched data
+      sessionId,
       sessionStatus: "approved",
       sessionJoinLink: meetingLink,
     };
   
     try {
-      const res = await fetch('/api/session/approve', {
-        method: 'POST',
+      // Fix 1: Change method to PUT
+      // Fix 2: Add credentials: 'include' to send cookies
+      // Fix 3: Verify the correct endpoint path
+      const res = await fetch('/api/sessions/approve', {
+        method: 'PUT', // MUST match your API route method
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Crucial for sending cookies
         body: JSON.stringify(payload),
       });
+  
+      // Add error handling
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to approve session');
+      }
+  
       const data = await res.json();
       console.log('Session approved successfully:', data);
+      
+      // Optional: Refresh the sessions list
+      const refreshRes = await fetch('/api/sessions/mentor');
+      const refreshData = await refreshRes.json();
+      setUpcomingSessions(refreshData.data || []);
+      
     } catch (error) {
       console.error('Error approving session:', error);
+      alert(`Approval failed: ${error.message}`);
     }
   };
-  
 
   // Handler for session cancellation
   const handleCancelClick = (session) => {

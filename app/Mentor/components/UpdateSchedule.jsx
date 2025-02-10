@@ -307,7 +307,7 @@ const MentorSlotScheduler = () => {
       return;
     }
     const mentorId = userDetails.id;
-    const apiUrl = `https://5c93-2402-a00-166-1023-4d6d-24c2-49dc-fe9.ngrok-free.app/api/v1/mentor/create-slot/${mentorId}`;
+    const apiUrl = process.env.BASEURL+`/api/v1/mentor/create-slot/${mentorId}`;
 
     // Log the API URL and payload.
     console.log("API URL:", apiUrl);
