@@ -22,6 +22,17 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/P2P/components/BannerCard.jsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/P2P/components/BannerCard.jsx",
+    "app/StudentDashboard/Navbar.jsx",
+    "app/StudentDashboard/Components/Session/Navbar.jsx",
+    "app/StudentDashboard/Components/Session/SessionsPage.jsx",
+    "app/StudentDashboard/Components/Session/SessionList.jsx",
+    "app/StudentDashboard/Components/Session/Pagination.jsx"
+  ],
   "exclude": ["node_modules"]
 }

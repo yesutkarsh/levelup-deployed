@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { useProfile } from '@/context/ProfileContext';
 
-export default function WelcomeCard() {
+export default function WelcomeCard({name}) {
   const fileInputRef = useRef(null);
   const { profileImage, setProfileImage } = useProfile();
 
@@ -49,7 +49,7 @@ export default function WelcomeCard() {
         />
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
-            Welcome back, Sarah!
+            Welcome back, {name}
             <span className="text-sm text-gray-500 ml-2">Have a great day!</span>
           </h2>
           <p className="text-gray-500">Computer Science Student | Year 3</p>

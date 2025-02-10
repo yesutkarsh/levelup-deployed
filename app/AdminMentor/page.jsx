@@ -10,12 +10,15 @@ import { useState } from 'react';
 import styles from './style.module.css';
 import Session from './components/Sessions/Session';
 import AllEvent from './components/AllEvent/AllEvent';
+import AvailabilityAndRules from './components/Availability/components/AvailabilityForm';
+import Availability from './components/Availability/Availability';
 
 const Sidebar = ({ activeOption, setActiveOption }) => {
   const sidebarOptions = [
-    { id: 0, label: 'Dashboard', icon: '📊' },
-    { id: 1, label: 'Sessions', icon: '👤' },
-    { id: 2, label: 'Events', icon: '⚙️' },
+    { id: 0, label: "Dashboard", icon: "📊" },
+    { id: 1, label: "Sessions", icon: "👤" },
+    { id: 2, label: "Events", icon: "⚙️" },
+    { id: 3, label: "Availability", icon: "⚙" },
   ];
 
   const handleOptionClick = (id) => {
@@ -52,12 +55,14 @@ const renderComponent = (activeOption) => {
       return <Session/>;
     case 2:
       return <AllEvent/>;
+    // case 3:
+    //   return <Availability/>;
     default:
       return <Dashboard />;
   }
 };
 
-export default function Page() {
+export default function page() {
   const [activeOption, setActiveOption] = useState(0);
 
   return (

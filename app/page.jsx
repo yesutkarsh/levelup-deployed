@@ -70,7 +70,7 @@ const PremiumLanding = () => {
               <button
                 onClick={toggleAuthCard}
                 className={`
-                  relative overflow-hidden px-8 sm:px-12 py-3 sm:py-5 bg-white text-black 
+                  relative overflow-hidden px-8 sm:px-12 py-3 sm:py-5 bg-white text-black
                   rounded-full font-medium text-lg transition-all duration-500
                   hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]
                   ${isHovered ? "tracking-widest" : "tracking-wide"}
@@ -85,8 +85,8 @@ const PremiumLanding = () => {
                 />
                 <span
                   className={`
-                    absolute inset-1 flex items-center justify-center text-white 
-                    ${isHovered ? "translate-y-0" : "translate-y-full"}
+                    absolute z-[99] inset-1 flex items-center justify-center text-white
+                    ${isHovered ? "translate-y-0 border-[none]" : "translate-y-full"}
                   `}
                 >
                   SIGNUP
