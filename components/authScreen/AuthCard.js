@@ -9,7 +9,6 @@ export default function AuthCard() {
   const [activeTab, setActiveTab] = useState("signin");
   const [name, setName] = useState("");
   const [phoneNumber, setPhone] = useState("");
-  const [registerType, setRegisterType] = useState("student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
