@@ -61,6 +61,7 @@ export async function POST(request) {
       return NextResponse.json(data, { status: externalRes.status });
     } catch (e) {
       // If not JSON, return text response
+      console.log(e)
       return NextResponse.json({ 
         message: responseText 
       }, { status: externalRes.status });
