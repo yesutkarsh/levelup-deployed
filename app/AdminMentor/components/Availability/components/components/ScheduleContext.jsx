@@ -7,33 +7,22 @@ const ScheduleContext = createContext();
 
 /**
  * ScheduleProvider is a context provider that shares state across components.
- * It manages working hours, session settings, slot configurations, booking rules, and schedule data.
  */
 export function ScheduleProvider({ children }) {
-  // State to manage working hours
   const [workingHours, setWorkingHours] = useState({
-    start: "09:00", // Start of the working day
-    end: "17:00", // End of the working day
+    start: "09:00",
+    end: "17:00",
   });
 
-  // State to manage session settings (duration and buffer)
   const [sessionSettings, setSessionSettings] = useState({
-    duration: "45", // Session duration in minutes (as a string)
-    buffer: "10", // Buffer time between sessions in minutes
+    duration: "45",
+    buffer: "10",
   });
 
-  // State to manage slot configurations for different days
   const [slots, setSlots] = useState([]);
-
-  // State to manage booking rules
-  const [bookingRules, setBookingRules] = useState({
-    reassignMentor: "", // Option to reassign a mentor
-  });
-
-  // State to manage the schedule, which updates as bookings change
+  const [bookingRules, setBookingRules] = useState({ reassignMentor: "" });
   const [schedule, setSchedule] = useState([]);
 
-  // Provide the state and its setters to the children components
   return (
     <ScheduleContext.Provider
       value={{
@@ -55,9 +44,12 @@ export function ScheduleProvider({ children }) {
 }
 
 /**
- * useSchedule is a custom hook for accessing the schedule context.
- * It provides all the shared state and setters from the ScheduleProvider.
+ * Custom Hook for accessing the schedule context
  */
 export function useSchedule() {
-  return useContext(ScheduleContext);
+  const context = useContext(ScheduleContext);
+  if (!context) {
+    throw new Error("useSchedule must be used within a ScheduleProvider");
+  }
+  return context;
 }

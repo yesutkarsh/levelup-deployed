@@ -1,3 +1,4 @@
+"use client";
 // Components/Session/Pagination.jsx
 import React from "react";
 

@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,20 +23,18 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/P2P/components/BannerCard.jsx",
-    "app/StudentDashboard/Navbar.jsx",
-    "app/StudentDashboard/Components/Session/Navbar.jsx",
-    "app/StudentDashboard/Components/Session/SessionsPage.jsx",
-    "app/StudentDashboard/Components/Session/SessionList.jsx",
-    "app/StudentDashboard/Components/Session/Pagination.jsx"
-  ],
-  "exclude": ["node_modules"]
+    "**/*.ts",
+    "**/*.tsx"
+, "app/AdminMentor/components/AllEvent/components/event-stats.jsx", "app/AdminMentor/components/AllEvent/components/events-table.jsx", "app/AdminMentor/components/AllEvent/components/header.jsx", "app/AdminMentor/components/AllEvent/components/layout.jsx", "app/AdminMentor/components/AllEvent/components/recent-events.jsx", "app/P2P/page.jsx", "app/layout.jsx"  ]
 }

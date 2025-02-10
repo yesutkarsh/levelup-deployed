@@ -132,7 +132,7 @@ export default function AvailabilityAndRules() {
                       start: e.target.value,
                     }))
                   }
-                  className="w-full rounded-md border-gray-300"
+                  className="w-full rounded-md border border-gray-300 p-2"
                 />
               </div>
               <div>
@@ -148,7 +148,7 @@ export default function AvailabilityAndRules() {
                       end: e.target.value,
                     }))
                   }
-                  className="w-full rounded-md border-gray-300"
+                  className="w-full rounded-md border border-gray-300 p-2"
                 />
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function AvailabilityAndRules() {
 
             <button
               onClick={handleAddSlot}
-              className="w-full mt-2 px-4 py-2 text-sm font-semibold text-white bg-black rounded-xl transition-all duration-200"
+              className="w-full mt-2 px-4 py-4 text-sm font-semibold text-white bg-black rounded-xl transition-all duration-200"
             >
               Add Slot Configuration
             </button>
@@ -262,7 +262,7 @@ export default function AvailabilityAndRules() {
                     duration: e.target.value,
                   }))
                 }
-                className="w-full rounded-md border-gray-300"
+                className="w-full rounded-md border-gray-300 border py-3 px-2"
               >
                 <option value="10">10 minutes</option>
                 <option value="30">30 minutes</option>
@@ -282,7 +282,7 @@ export default function AvailabilityAndRules() {
                     buffer: e.target.value,
                   }))
                 }
-                className="w-full rounded-md border-gray-300"
+                className="w-full rounded-md border-gray-300 border py-3 px-2"
               >
                 <option value="0">0 minutes</option>
                 <option value="5">5 minutes</option>
@@ -309,7 +309,7 @@ export default function AvailabilityAndRules() {
                     reassignMentor: e.target.value,
                   }))
                 }
-                className="w-[200px] rounded-md border-gray-300"
+                className="w-[200px] rounded-md border-gray-300 border py-3 px-2"
               >
                 <option value="">Select a mentor</option>
                 <option value="mentor1">John Smith</option>

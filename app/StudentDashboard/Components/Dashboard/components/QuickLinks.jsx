@@ -1,3 +1,5 @@
+"use client";
+
 import { Calendar, BookOpen, CheckSquare, LineChart } from "lucide-react";
 
 export default function QuickLinks({ onNavChange }) {

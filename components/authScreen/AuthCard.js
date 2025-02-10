@@ -5,21 +5,23 @@ import { AuthToggle } from "./context/authContext";
 import { motion } from "framer-motion";
 
 export default function AuthCard() {
-
-
-  // activeTab can be "signin", "signup", or "forgot"
+  // Active tab: "signin", "signup", or "forgot"
   const [activeTab, setActiveTab] = useState("signin");
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneNumber, setPhone] = useState("");
   const [registerType, setRegisterType] = useState("student");
   const [email, setEmail] = useState("user@example.com");
   const [password, setPassword] = useState("Password123!");
 
-  // Error states
+  // Field error states
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [nameError, setNameError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  
+  // API response messages
+  const [apiError, setApiError] = useState("");
+  const [apiMessage, setApiMessage] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -27,7 +29,7 @@ export default function AuthCard() {
   const { toggleAuthCard } = useContext(AuthToggle);
   const router = useRouter();
 
-  // For Forgot Password
+  // For Forgot Password (UI only)
   const [isResetSent, setIsResetSent] = useState(false);
   const [resetCountdown, setResetCountdown] = useState(60);
 
@@ -47,12 +49,13 @@ export default function AuthCard() {
     return strength >= 3;
   };
 
-  // --- Redirect after sign in/up ---
+  // --- Redirect after sign in/up (if needed) ---
   useEffect(() => {
     if (isRedirecting) {
       const timer = setTimeout(() => {
-        router.push("/StudentDashboard");
-        toggleAuthCard();
+        // Uncomment below lines if you want to redirect after success:
+        // router.push("/StudentDashboard");
+        // toggleAuthCard();
       }, 2500);
       return () => clearTimeout(timer);
     }
@@ -73,38 +76,109 @@ export default function AuthCard() {
     return () => clearInterval(timer);
   }, [activeTab, isResetSent, resetCountdown]);
 
-  // --- Log details function ---
-  const logDetails = (details) => {
-    console.log("Auth details:", details);
+  // --- API call for user registration (Sign Up) ---
+  const Register = async (details) => {
+    console.log(details)
+    try {
+      // Reset API messages and start spinner
+      setApiError("");
+      setApiMessage("");
+      setIsRedirecting(true);
+
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Include credentials so that cookies are correctly handled
+        credentials: "include",
+        body: JSON.stringify(details),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setApiError(data.error || "Registration failed");
+        setIsRedirecting(false);
+      } else {
+        setApiMessage(data.message || "Registration successful. Please log in.");
+        // Clear signup fields and switch to signin mode
+        setName("");
+        setPhone("");
+        setPassword("");
+        setActiveTab("signin");
+        setIsRedirecting(false);
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setApiError("Registration failed due to network error.");
+      setIsRedirecting(false);
+    }
+  };
+
+  // --- API call for login (Sign In) ---
+  const Login = async (details) => {
+    try {
+      // Reset API messages and start spinner
+      setApiError("");
+      setApiMessage("");
+      setIsRedirecting(true);
+
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Include credentials to allow cookies to be received/sent
+        credentials: "include",
+        body: JSON.stringify(details),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setApiError(data.error || "Login failed");
+        setIsRedirecting(false);
+      } else {
+        setApiMessage(data.message || "Login successful");
+        // At this point, the accessToken and refreshToken have been set in HTTP-only cookies.
+        // Optionally, you can redirect the user after a successful login:
+        router.push("/StudentDashboard");
+        setIsRedirecting(false);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      setApiError("Login failed due to network error.");
+      setIsRedirecting(false);
+    }
   };
 
   // --- Handle form submission ---
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Reset all errors
+    // Reset error and API messages
     setEmailError("");
     setPasswordError("");
     setNameError("");
     setPhoneError("");
+    setApiError("");
+    setApiMessage("");
 
     if (activeTab === "signin") {
       if (!validateEmail(email)) {
         setEmailError("Please enter a valid email address.");
         return;
       }
-      if (!validatePassword(password)) {
-        setPasswordError("Password is not strong enough.");
-        return;
-      }
-      logDetails({ email, password });
-      setIsRedirecting(true);
+      // if (!validatePassword(password)) {
+      //   setPasswordError("Password is not strong enough.");
+      //   return;
+      // }
+      Login({ email, password });
     } else if (activeTab === "signup") {
       if (!name.trim()) {
         setNameError("Please enter your name.");
         return;
       }
-      if (!phone.trim()) {
+      if (!phoneNumber.trim()) {
         setPhoneError("Please enter your phone number.");
         return;
       }
@@ -112,22 +186,23 @@ export default function AuthCard() {
         setEmailError("Please enter a valid email address.");
         return;
       }
-      if (!validatePassword(password)) {
-        setPasswordError("Password is not strong enough.");
-        return;
-      }
-      logDetails({ name, phone, email, password, registerType });
-      setIsRedirecting(true);
+      // if (!validatePassword(password)) {
+      //   setPasswordError("Password is not strong enough.");
+      //   return;
+      // }
+      Register({ name, phoneNumber, email, password, registerType });
     } else if (activeTab === "forgot") {
       if (!validateEmail(email)) {
         setEmailError("Please enter a valid email address.");
         return;
       }
-      logDetails({ email });
+      // Simulate sending reset link
+      setApiMessage("Reset link sent to your email.");
       setIsResetSent(true);
     }
   };
 
+  // --- Utility for password strength color ---
   const getPasswordStrengthColor = () => {
     switch (passwordStrength) {
       case 1:
@@ -153,7 +228,6 @@ export default function AuthCard() {
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={toggleAuthCard}
       />
-
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -193,7 +267,6 @@ export default function AuthCard() {
                 )}
               </motion.button>
             </div>
-
             <div className="relative">
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -218,8 +291,28 @@ export default function AuthCard() {
           </div>
         )}
 
+        {/* Display API response messages */}
+        {apiError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-4 p-2 rounded bg-red-100 text-red-700 text-center text-sm"
+          >
+            {apiError}
+          </motion.div>
+        )}
+        {apiMessage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-4 p-2 rounded bg-green-100 text-green-700 text-center text-sm"
+          >
+            {apiMessage}
+          </motion.div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* --- Sign Up additional fields --- */}
+          {/* Additional fields for Sign Up */}
           {activeTab === "signup" && (
             <>
               <div>
@@ -244,7 +337,6 @@ export default function AuthCard() {
                   </motion.p>
                 )}
               </div>
-
               <div>
                 <label className="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-2">
                   Phone Number
@@ -252,7 +344,7 @@ export default function AuthCard() {
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
                   type="text"
-                  value={phone}
+                  value={phoneNumber}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                   placeholder="Enter your phone number"
@@ -270,7 +362,7 @@ export default function AuthCard() {
             </>
           )}
 
-          {/* --- Email Field (common to all) --- */}
+          {/* Common Email Field */}
           <div>
             <label className="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-2">
               Email
@@ -294,7 +386,7 @@ export default function AuthCard() {
             )}
           </div>
 
-          {/* --- Password Field (only for Sign In and Sign Up) --- */}
+          {/* Password Field (not needed for forgot password) */}
           {activeTab !== "forgot" && (
             <div>
               <label className="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-2">
@@ -317,11 +409,7 @@ export default function AuthCard() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 >
-                  <i
-                    className={`ri-${
-                      showPassword ? "eye-off-line" : "eye-line"
-                    } text-lg`}
-                  />
+                  <i className={`ri-${showPassword ? "eye-off-line" : "eye-line"} text-lg`} />
                 </button>
               </div>
               {passwordError && (
@@ -346,7 +434,7 @@ export default function AuthCard() {
             </div>
           )}
 
-          {/* --- Registration Type (only for Sign Up) --- */}
+          {/* Registration Type (only for Sign Up) */}
           {activeTab === "signup" && (
             <div>
               <label className="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-2">
@@ -361,9 +449,7 @@ export default function AuthCard() {
                     onChange={() => setRegisterType("student")}
                     className="form-radio"
                   />
-                  <span className="text-gray-700 dark:text-gray-200">
-                    Student
-                  </span>
+                  <span className="text-gray-700 dark:text-gray-200">Student</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input
@@ -373,56 +459,53 @@ export default function AuthCard() {
                     onChange={() => setRegisterType("instructor")}
                     className="form-radio"
                   />
-                  <span className="text-gray-700 dark:text-gray-200">
-                    Instructor
-                  </span>
+                  <span className="text-gray-700 dark:text-gray-200">Instructor</span>
                 </label>
               </div>
             </div>
           )}
 
-<motion.button
-  whileHover={{ scale: 1.02 }}
-  whileTap={{ scale: 0.98 }}
-  type="submit"
-  disabled={isRedirecting || (activeTab === "forgot" && isResetSent)}
-  className={`w-full py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center ${
-    activeTab === "forgot" && isResetSent
-      ? "bg-gray-400 dark:bg-gray-600 text-gray-200 dark:text-gray-400 cursor-not-allowed"
-      : "bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100"
-  }`}
->
-  {isRedirecting ? (
-    // A simple spinner for sign in/up
-    <svg
-      className="animate-spin h-5 w-5 text-white dark:text-black"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      ></path>
-    </svg>
-  ) : activeTab === "signin" ? (
-    "Sign In"
-  ) : activeTab === "signup" ? (
-    "Sign Up"
-  ) : (
-    "Send Reset Link"
-  )}
-</motion.button>
-
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isRedirecting || (activeTab === "forgot" && isResetSent)}
+            className={`w-full py-3 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center ${
+              activeTab === "forgot" && isResetSent
+                ? "bg-gray-400 dark:bg-gray-600 text-gray-200 dark:text-gray-400 cursor-not-allowed"
+                : "bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100"
+            }`}
+          >
+            {isRedirecting ? (
+              // Spinner while processing the request
+              <svg
+                className="animate-spin h-5 w-5 text-white dark:text-black"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                ></path>
+              </svg>
+            ) : activeTab === "signin" ? (
+              "Sign In"
+            ) : activeTab === "signup" ? (
+              "Sign Up"
+            ) : (
+              "Send Reset Link"
+            )}
+          </motion.button>
         </form>
 
         {/* Forgot Password link (only in Sign In mode) */}

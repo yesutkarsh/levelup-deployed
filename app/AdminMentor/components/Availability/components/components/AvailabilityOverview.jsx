@@ -24,17 +24,23 @@ export default function AvailabilityOverview() {
   const updateSlotStatus = (index, newStatus, student = "-") => {
     setSchedule((prev) => {
       const newSchedule = [...prev];
+
+      let statusColor;
+      if (newStatus === "Booked") {
+        statusColor = "text-[#f00] bg-blue-100"; // Blue for booked slots
+      } else if (newStatus === "Blocked") {
+        statusColor = "text-gray-700 bg-gray-200"; // Gray for blocked slots
+      } else if (newStatus === "Available") {
+        statusColor = "text-green-700 bg-green-100"; // Green for available slots
+      }
+
       newSchedule[index] = {
         ...newSchedule[index],
         status: newStatus,
         student,
-        statusColor:
-          newStatus === "Booked"
-            ? "text-red-700 bg-red-100"
-            : newStatus === "Blocked"
-            ? "text-gray-700 bg-gray-200"
-            : "text-green-700 bg-green-100",
+        statusColor,
       };
+
       return newSchedule;
     });
   };

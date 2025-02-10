@@ -1,3 +1,4 @@
+"use client";
 // Components/Session/SessionsPage.jsx
 import React, { useState, useEffect } from "react";
 import SessionTabs from "./SessionTabs";

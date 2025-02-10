@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Script from "next/script";
-import { ScheduleProvider } from "../components/ScheduleContext"; // Adjust the path as needed
+import { ScheduleProvider } from "./AdminMentor/components/Availability/components/ScheduleContext"; // ✅ Correct path
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +23,11 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={inter.className}>
-        <ScheduleProvider>{children}</ScheduleProvider>
+        <ScheduleProvider>
+          {" "}
+          {/* ✅ Wrap everything inside ScheduleProvider */}
+          {children}
+        </ScheduleProvider>
       </body>
     </html>
   );

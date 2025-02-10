@@ -1,3 +1,4 @@
+"use client";
 // Components/Session/SessionList.jsx
 import React from "react";
 import SessionItem from "./SessionItem";

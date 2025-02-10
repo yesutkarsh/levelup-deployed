@@ -1,3 +1,4 @@
+"use client";
 // Components/sessions/SessionTabs.jsx
 export default function SessionTabs({
   activeTab,

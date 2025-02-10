@@ -1,3 +1,5 @@
+"use client";
+
 export default function ProgressOverview() {
   const progressData = [
     { label: "Course Completion", percentage: 75 },

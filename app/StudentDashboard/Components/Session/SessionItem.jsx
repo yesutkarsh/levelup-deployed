@@ -1,3 +1,4 @@
+"use client";
 // Components/Session/SessionItem.jsx
 import React from "react";
 import { Clock, Tag } from "lucide-react";

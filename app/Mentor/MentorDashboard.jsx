@@ -2,6 +2,8 @@
 import React, { useState, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import UpdateSchedule from './components/UpdateSchedule';
+import MentorDetails from './components/MentorDetails';
 
 export default function MentorDashboard() {
   // Tab state
@@ -133,130 +135,9 @@ export default function MentorDashboard() {
 
         {/* ---------------------- Tab 1: Mentor Details ---------------------- */}
         {activeTab === "details" && (
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-semibold text-gray-800">Personal Details</h2>
-              {!editMode ? (
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
-                >
-                  Change Details
-                </button>
-              ) : (
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
-                >
-                  Save
-                </button>
-              )}
-            </div>
-
-            <div className="space-y-5">
-              {/* Name */}
-              <div className="flex items-center">
-                <span className="w-40 font-medium text-gray-700">Name:</span>
-                {editMode ? (
-                  <input
-                    name="name"
-                    value={mentorDetails.name}
-                    onChange={handleDetailChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                ) : (
-                  <span className="text-gray-800">{mentorDetails.name}</span>
-                )}
-              </div>
-
-              {/* Email */}
-              <div className="flex items-center">
-                <span className="w-40 font-medium text-gray-700">Email:</span>
-                {editMode ? (
-                  <input
-                    name="email"
-                    value={mentorDetails.email}
-                    onChange={handleDetailChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                ) : (
-                  <span className="text-gray-800">{mentorDetails.email}</span>
-                )}
-              </div>
-
-              {/* Resume */}
-              <div className="flex items-center">
-                <span className="w-40 font-medium text-gray-700">Resume:</span>
-                <span className="text-gray-800 mr-4">{mentorDetails.resume}</span>
-                {editMode && (
-                  <>
-                    <button
-                      onClick={() => fileInputRef.current.click()}
-                      className="bg-black text-white px-3 py-1 rounded hover:bg-gray-800 transition"
-                    >
-                      Upload New Resume
-                    </button>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleResumeUpload}
-                      className="hidden"
-                    />
-                  </>
-                )}
-              </div>
-
-              {/* Skills */}
-              <div className="flex items-start">
-                <span className="w-40 font-medium text-gray-700">Skills:</span>
-                <div className="w-full">
-                  {mentorDetails.skills.length > 0 ? (
-                    <ul className="list-disc pl-5 mb-3">
-                      {mentorDetails.skills.map((skill, index) => (
-                        <li key={index} className="text-gray-800">
-                          {skill}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-600">No skills added yet.</p>
-                  )}
-                  {editMode && (
-                    <div className="flex space-x-2">
-                      <input
-                        type="text"
-                        value={newSkill}
-                        onChange={(e) => setNewSkill(e.target.value)}
-                        placeholder="Add new skill"
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                      />
-                      <button
-                        onClick={handleAddSkill}
-                        className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
-                      >
-                        Add Skill
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Qualification */}
-              <div className="flex items-center">
-                <span className="w-40 font-medium text-gray-700">Qualification:</span>
-                {editMode ? (
-                  <input
-                    name="qualification"
-                    value={mentorDetails.qualification}
-                    onChange={handleDetailChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                  />
-                ) : (
-                  <span className="text-gray-800">{mentorDetails.qualification}</span>
-                )}
-              </div>
-            </div>
-          </div>
+          <>
+          <MentorDetails/>
+          </>
         )}
 
         {/* ---------------------- Tab 2: Upcoming Sessions ---------------------- */}
@@ -328,65 +209,9 @@ export default function MentorDashboard() {
 
         {/* ---------------------- Tab 3: Update Schedule ---------------------- */}
         {activeTab === "schedule" && (
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
-            <h2 className="text-3xl font-semibold mb-6 text-gray-800">Update Schedule</h2>
-            <form onSubmit={handleScheduleSubmit} className="space-y-5 mb-6">
-              <div>
-                <label className="block mb-2 font-medium text-gray-700">Date</label>
-                <input
-                  type="date"
-                  value={scheduleInput.date}
-                  onChange={(e) =>
-                    setScheduleInput({ ...scheduleInput, date: e.target.value })
-                  }
-                  className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-medium text-gray-700">Day</label>
-                <input
-                  type="text"
-                  placeholder="e.g., Monday"
-                  value={scheduleInput.day}
-                  onChange={(e) =>
-                    setScheduleInput({ ...scheduleInput, day: e.target.value })
-                  }
-                  className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-medium text-gray-700">Time</label>
-                <input
-                  type="time"
-                  value={scheduleInput.time}
-                  onChange={(e) =>
-                    setScheduleInput({ ...scheduleInput, time: e.target.value })
-                  }
-                  className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition"
-              >
-                Add Schedule
-              </button>
-            </form>
-            <div>
-              <h3 className="text-2xl font-medium mb-4 text-gray-800">Upcoming Schedule</h3>
-              {scheduleList.length === 0 ? (
-                <p className="text-gray-600">No schedule added yet.</p>
-              ) : (
-                <ul className="space-y-3">
-                  {scheduleList.map((item, idx) => (
-                    <li key={idx} className="p-4 border rounded-lg shadow bg-gray-50">
-                      {item.date} - {item.day} at {item.time}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
+          <>
+          <UpdateSchedule/>
+          </>
         )}
 
         {/* ---------------------- Tab 4: Analytics ---------------------- */}

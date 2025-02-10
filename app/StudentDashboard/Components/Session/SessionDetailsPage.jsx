@@ -1,3 +1,4 @@
+"use client";
 // Components/sessions/SessionDetailsPage.jsx
 import React from "react";
 

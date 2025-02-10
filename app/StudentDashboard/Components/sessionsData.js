@@ -53,9 +53,9 @@ const sessionsData = [
     title: "AI Fundamentals",
     batch: "Batch 2024D",
     subject: "ML101",
-    date: "2025-02-13",
-    time: "11:00 AM",
-    duration: "1h 30m",
+    date: "2025-02-10",
+    time: "03:54 PM",
+    duration: "0h 1m",
     instructor: "Dr. Lisa Park",
     resources: [
       "https://www.ibm.com/cloud/learn/what-is-artificial-intelligence",
