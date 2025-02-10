@@ -436,33 +436,9 @@ export default function AuthCard() {
 
           {/* Registration Type (only for Sign Up) */}
           {activeTab === "signup" && (
-            <div>
-              <label className="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-2">
-                Register as
-              </label>
-              <div className="flex space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    value="student"
-                    checked={registerType === "student"}
-                    onChange={() => setRegisterType("student")}
-                    className="form-radio"
-                  />
-                  <span className="text-gray-700 dark:text-gray-200">Student</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    value="instructor"
-                    checked={registerType === "instructor"}
-                    onChange={() => setRegisterType("instructor")}
-                    className="form-radio"
-                  />
-                  <span className="text-gray-700 dark:text-gray-200">Instructor</span>
-                </label>
-              </div>
-            </div>
+            <>
+            
+            </>
           )}
 
           <motion.button
@@ -503,7 +479,7 @@ export default function AuthCard() {
             ) : activeTab === "signup" ? (
               "Sign Up"
             ) : (
-              "Send Reset Link"
+              "Send Reset Link | Working On This Feature"
             )}
           </motion.button>
         </form>

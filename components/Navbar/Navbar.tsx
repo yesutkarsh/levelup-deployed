@@ -6,29 +6,30 @@ import {
   User,
   LogOut,
   Home,
-  Info,
   Calendar,
   UserCircle,
   X,
+  FileVideo2,
+  LayoutDashboard,
+  SquareDashedBottomCode
 } from "lucide-react";
 import Link from "next/link";
 
 type SidePanelProps = {
   onClose: () => void;
+  onLogoutClick: () => void;
 };
 
-// Create an animated Link component using Framer Motion
 const MotionLink = motion(Link);
 
-// Redesigned Side Panel Component
-function SidePanel({ onClose }:SidePanelProps): React.ReactElement {
+function SidePanel({ onClose, onLogoutClick }: SidePanelProps): React.ReactElement {
   return (
     <motion.div
       initial={{ x: "-100%" }}
       animate={{ x: 0 }}
       exit={{ x: "-100%" }}
       transition={{ type: "spring", damping: 25, stiffness: 300 }}
-      className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50"
+      className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 flex flex-col"
     >
       <div className="p-4 border-b">
         <div className="flex justify-between items-center">
@@ -43,24 +44,62 @@ function SidePanel({ onClose }:SidePanelProps): React.ReactElement {
           </motion.button>
         </div>
       </div>
-      <nav className="p-4 space-y-2">
-        <MotionLink
-          href="/Dashboard"
+      <nav className="p-4 flex-1 flex flex-col">
+        <div className="space-y-2">
+          <MotionLink
+            href="/Dashboard"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+          >
+            <Home className="w-5 h-5 mr-2" />
+            Dashboard
+          </MotionLink>
+          <MotionLink
+            href="/UserManagement"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+          >
+            <User className="w-5 h-5 mr-2" />
+            UserManagement
+          </MotionLink>
+          <MotionLink
+            href="/StudentDashboard"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+          >
+            <SquareDashedBottomCode className="w-5 h-5 mr-2" />
+            Student Dashboard
+          </MotionLink>
+          <MotionLink
+            href="/Mentor"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+          >
+            <LayoutDashboard className="w-5 h-5 mr-2" />
+            Mentor Dashboard
+          </MotionLink>
+          <MotionLink
+            href="/Booksession"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+          >
+            <FileVideo2 className="w-5 h-5 mr-2" />
+            Book Session
+          </MotionLink>
+        </div>
+
+        {/* Sidebar Logout Button */}
+        <motion.button
           whileHover={{ scale: 1.02 }}
-          className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
+          onClick={() => {
+            onClose();
+            onLogoutClick();
+          }}
+          className="mt-auto flex items-center p-2 rounded-md hover:bg-red-50 text-red-600 w-full transition-colors"
         >
-          <Home className="w-5 h-5 mr-2" />
-          Dashboard
-        </MotionLink>
-        <MotionLink
-          href="/about"
-          whileHover={{ scale: 1.02 }}
-          className="flex items-center p-2 rounded-md hover:bg-gray-100 text-gray-800"
-        >
-          <Info className="w-5 h-5 mr-2" />
-          About
-        </MotionLink>
-        {/* Add more side panel links as needed */}
+          <LogOut className="w-5 h-5 mr-2" />
+          Logout
+        </motion.button>
       </nav>
     </motion.div>
   );
@@ -69,30 +108,43 @@ function SidePanel({ onClose }:SidePanelProps): React.ReactElement {
 export default function Navbar() {
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const toggleMenu = () => setIsSidePanelOpen(!isSidePanelOpen);
-  const closeMenu = () => setIsSidePanelOpen(false);
+  const handleLogout = () => {
+    // Clear all cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+    });
+
+    // Start logout animation
+    setIsLoggingOut(true);
+    setShowLogoutModal(false);
+
+    // Redirect after animation
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 2000);
+  };
 
   return (
     <>
       {/* Top Navbar */}
       <nav className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-50 flex items-center px-4 justify-between">
-        {/* Hamburger Button */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={toggleMenu}
+          onClick={() => setIsSidePanelOpen(true)}
           className="p-2 rounded-lg hover:bg-gray-100 transition"
         >
           <Menu className="w-6 h-6 text-gray-700" />
         </motion.button>
 
-        {/* Logo */}
         <MotionLink href="/" className="text-xl font-bold text-black">
           MASAI CONNECT
         </MotionLink>
 
-        {/* Profile & Logout */}
         <div className="flex items-center space-x-2">
           <MotionLink
             href="/profile"
@@ -112,6 +164,45 @@ export default function Navbar() {
           </motion.button>
         </div>
       </nav>
+
+      {/* Logout Loading Overlay */}
+      <AnimatePresence>
+        {isLoggingOut && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white/90 backdrop-blur-sm z-[60] flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              className="flex flex-col items-center"
+            >
+              <div className="relative w-24 h-24">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-full h-full border-4 border-indigo-500/20 rounded-full"
+                />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="absolute top-0 left-0 w-full h-full border-4 border-indigo-500 border-t-transparent rounded-full"
+                />
+              </div>
+              <motion.span
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="mt-4 text-gray-700 font-medium"
+              >
+                Logging out...
+              </motion.span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Logout Confirmation Modal */}
       <AnimatePresence>
@@ -145,43 +236,31 @@ export default function Navbar() {
                 >
                   Cancel
                 </motion.button>
-                <MotionLink
-                  href="/"
+                <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
-                  onClick={() => {
-                    // Insert actual logout logic here if needed
-                    setShowLogoutModal(false);
-                  }}
+                  onClick={handleLogout}
                 >
                   Logout
-                </MotionLink>
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Side Panel Backdrop */}
+      {/* Side Panel */}
       <AnimatePresence>
         {isSidePanelOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeMenu}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          <SidePanel
+            onClose={() => setIsSidePanelOpen(false)}
+            onLogoutClick={() => setShowLogoutModal(true)}
           />
         )}
       </AnimatePresence>
 
-      {/* Side Panel */}
-      <AnimatePresence>
-        {isSidePanelOpen && <SidePanel onClose={closeMenu} />}
-      </AnimatePresence>
-
-      {/* Bottom Navbar (Mobile Only) */}
+      {/* Mobile Bottom Navbar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white shadow-md flex justify-around py-2 md:hidden z-50">
         <MotionLink
           href="/Dashboard"
