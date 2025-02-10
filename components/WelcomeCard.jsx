@@ -1,6 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { useProfile } from "@/context/ProfileContext";
+import Link from "next/link";
 
 export default function WelcomeCard({name, status}) {
   const fileInputRef = useRef(null);
@@ -51,7 +52,9 @@ export default function WelcomeCard({name, status}) {
             Welcome back, {name}
             <span className="text-sm text-gray-500 ml-2">{status}</span>
           </h2>
-          <p className="text-gray-500">Computer Science Student | Year 3</p>
+          <Link href={"/profile"}>
+          <p className="text-gray-500 underline"><i className="ri-pencil-fill"></i>Edit You Profile</p>
+          </Link>
         </div>
       </div>
     </div>

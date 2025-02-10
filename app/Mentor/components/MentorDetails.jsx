@@ -41,20 +41,22 @@ const SkillTag = ({ skill, onRemove, editMode }) => (
 
 export default function MentorDetails() {
   const [editMode, setEditMode] = useState(false);
+  const [error, setError] = useState(null);
   const [mentorDetails, setMentorDetails] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
     resume: "resume.pdf",
     skills: ["JavaScript", "React", "Next.js"],
     qualification: "MSc Computer Science",
+    currentCourses: ["coding"],
   });
   const [newSkill, setNewSkill] = useState("");
   const fileInputRef = useRef(null);
 
-  // Unified change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMentorDetails(prev => ({ ...prev, [name]: value }));
+    setError(null);
   };
 
   const handleSkillAdd = () => {
@@ -64,6 +66,7 @@ export default function MentorDetails() {
         skills: [...prev.skills, newSkill.trim()]
       }));
       setNewSkill("");
+      setError(null);
     }
   };
 
@@ -81,14 +84,81 @@ export default function MentorDetails() {
     }
   };
 
-  const handleSave = () => {
-    setEditMode(false);
-    // Here you would typically integrate with your API
-    console.log("Saving data:", mentorDetails);
+  const validateData = (userDetails) => {
+    const errors = [];
+    
+    if (!userDetails?.id) {
+      errors.push("User ID is missing");
+    }
+    
+    if (!mentorDetails.currentCourses?.length) {
+      errors.push("Current courses are required");
+    }
+    
+    if (!mentorDetails.skills?.length) {
+      errors.push("At least one skill is required");
+    }
+    
+    return errors;
+  };
+
+  const handleSave = async () => {
+    try {
+      setError(null);
+      
+      const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('userDetails='))
+        ?.split('=')[1];
+      
+      if (!cookieValue) {
+        setError('User details not found. Please log in again.');
+        return;
+      }
+
+      const userDetails = JSON.parse(decodeURIComponent(cookieValue));
+      
+      const validationErrors = validateData(userDetails);
+      if (validationErrors.length > 0) {
+        setError(validationErrors.join(', '));
+        return;
+      }
+
+      const requestBody = {
+        currentCourses: ['67a8f9c036bad2d56b320d54'],
+        userId: userDetails.id,
+        skills: mentorDetails.skills
+      };
+
+      console.log(requestBody)
+
+      const response = await fetch('https://5c93-2402-a00-166-1023-4d6d-24c2-49dc-fe9.ngrok-free.app/api/v1/mentor/profile-setup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        
+        throw new Error(data.message || 'Failed to save profile');
+      }
+
+      console.log('Profile setup successful:', data);
+      setEditMode(false);
+    } catch (error) {
+      console.log(error)
+
+      console.error('Error saving profile:', error);
+      setError(error.message || 'Failed to save profile. Please try again.');
+    }
   };
 
   return (
-    <div className=" bg-gray-50 flex items-center justify-center p-4">
+    <div className="bg-gray-50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -105,6 +175,16 @@ export default function MentorDetails() {
             {editMode ? "Save Changes" : "Edit Profile"}
           </motion.button>
         </div>
+
+        {error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-4 p-4 bg-red-50 text-red-600 rounded-lg"
+          >
+            {error}
+          </motion.div>
+        )}
 
         <div className="space-y-6">
           <InputField

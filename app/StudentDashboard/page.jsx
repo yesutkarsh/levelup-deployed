@@ -12,26 +12,26 @@ import Notifications from '@/components/Notifications';
 export default function Page() {
   const [userDetails, setUserDetails] = useState(null);
 
-  // useEffect(() => {
-  //   // Get user details from cookie
-  //   const getUserFromCookie = () => {
-  //     const cookie = document.cookie
-  //       .split('; ')
-  //       .find(row => row.startsWith('userDetails='));
-  //     if (cookie) {
-  //       const userDetailsStr = decodeURIComponent(cookie.split('=')[1]);
-  //       return JSON.parse(userDetailsStr);
-  //     }
-  //     return null;
-  //   };
+  useEffect(() => {
+    // Get user details from cookie
+    const getUserFromCookie = () => {
+      const cookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('userDetails='));
+      if (cookie) {
+        const userDetailsStr = decodeURIComponent(cookie.split('=')[1]);
+        return JSON.parse(userDetailsStr);
+      }
+      return null;
+    };
 
-  //   const details = getUserFromCookie();
-  //   setUserDetails(details);
-  // }, []);
+    const details = getUserFromCookie();
+    setUserDetails(details);
+  }, []);
 
-  // if (!userDetails) {
-  //   return <div>Loading...</div>;
-  // }
+  if (!userDetails) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -40,11 +40,12 @@ export default function Page() {
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12">
             <WelcomeCard 
-              name={"utkarsh"} 
-              status={"h"} 
+              name={userDetails.name} 
+              status={userDetails.status} 
             />
           </div>
           
+          {userDetails.status !== 'pending' && (
             <>
               <div className="col-span-12 lg:col-span-8">
                 <UpcomingSessions />
@@ -56,7 +57,7 @@ export default function Page() {
                 <Notifications />
               </div>
             </>
-          
+          )}
         </div>
       </div>
     </div>

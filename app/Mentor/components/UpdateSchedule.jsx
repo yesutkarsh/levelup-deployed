@@ -149,8 +149,6 @@ const SessionSummary = ({ startTime, sessionsCount, sessionDuration, bufferTime,
         <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full">
           {sessionsCount} Session Slots
         </div>
-        <br />
-        
         {wastedTime > 0 && (
           <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full">
             {wastedTime} Minutes Wasted
@@ -204,7 +202,7 @@ const MentorSlotScheduler = () => {
     const end24 = convertTimeTo24(endTime);
     const startTotal = convertToMinutes(start24);
     const endTotal = convertToMinutes(end24);
-    
+
     if (endTotal > startTotal) {
       setTotalMinutes(endTotal - startTotal);
     } else {
@@ -224,20 +222,19 @@ const MentorSlotScheduler = () => {
     }
   }, [totalMinutes, sessionDuration, bufferTime]);
 
-  // New useEffect to clear errorMsg automatically when inputs are valid
   useEffect(() => {
     const start24 = convertTimeTo24(startTime);
     const end24 = convertTimeTo24(endTime);
     const startTotal = convertToMinutes(start24);
     const endTotal = convertToMinutes(end24);
 
-    // If a date is selected and the end time is after the start time, clear any error message.
-    if (selectedDate && endTotal > startTotal) {
-      if (errorMsg) setErrorMsg("");
+    if (selectedDate && endTotal > startTotal && errorMsg) {
+      setErrorMsg("");
     }
   }, [selectedDate, startTime, endTime, errorMsg]);
 
-  const handleSaveSlots = () => {
+  // --- UPDATED handleSaveSlots FUNCTION ---
+  const handleSaveSlots = async () => {
     setErrorMsg("");
     setSuccessMsg("");
 
@@ -256,24 +253,92 @@ const MentorSlotScheduler = () => {
       return;
     }
 
-    const slotData = {
-      date: selectedDate.toISOString().split("T")[0],
-      startTime: start24,
-      endTime: end24,
-      sessionDuration,
-      bufferTime,
-      sessionsCount,
-      wastedTime,
+    // Construct the slots array based on the number of sessions.
+    const slots = [];
+    let baseStartMinutes = startTotal;
+    for (let i = 0; i < sessionsCount; i++) {
+      const sessionStartMinutes = baseStartMinutes + i * (sessionDuration + bufferTime);
+      const sessionEndMinutes = sessionStartMinutes + sessionDuration;
+
+      // Create Date objects using the selected date.
+      const sessionStartDate = new Date(selectedDate);
+      sessionStartDate.setHours(
+        Math.floor(sessionStartMinutes / 60),
+        sessionStartMinutes % 60,
+        0,
+        0
+      );
+      const sessionEndDate = new Date(selectedDate);
+      sessionEndDate.setHours(
+        Math.floor(sessionEndMinutes / 60),
+        sessionEndMinutes % 60,
+        0,
+        0
+      );
+
+      slots.push({
+        startTime: sessionStartDate.toISOString(),
+        endTime: sessionEndDate.toISOString(),
+      });
+    }
+
+    // Retrieve userDetails cookie dynamically.
+    const getCookie = (name) => {
+      const cookieArr = document.cookie.split(";");
+      for (let cookie of cookieArr) {
+        const [key, value] = cookie.trim().split("=");
+        if (key === name) {
+          return value;
+        }
+      }
+      return null;
     };
 
-    console.log("Slot data:", slotData);
-    setSuccessMsg("Slots saved successfully!");
+    const userDetailsCookie = getCookie("userDetails");
+    if (!userDetailsCookie) {
+      setErrorMsg("User details not found in cookies.");
+      return;
+    }
+    let userDetails;
+    try {
+      userDetails = JSON.parse(decodeURIComponent(userDetailsCookie));
+    } catch (error) {
+      setErrorMsg("Failed to parse user details.");
+      return;
+    }
+    const mentorId = userDetails.id;
+    const apiUrl = `https://5c93-2402-a00-166-1023-4d6d-24c2-49dc-fe9.ngrok-free.app/api/v1/mentor/create-slot/${mentorId}`;
+
+    // Log the API URL and payload.
+    console.log("API URL:", apiUrl);
+    console.log("Payload:", slots );
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify( {slots} ),
+      });
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.message || "Failed to create slots");
+      // }
+      const data = await response.json();
+      console.log("API Response:", data);
+      setSuccessMsg("Slots created successfully!");
+    } catch (error) {
+      console.error("Error creating slots:", error);
+      setErrorMsg("Error creating slots: " + error.message);
+    }
   };
+  // --- END UPDATED FUNCTION ---
 
   const handleMonthChange = (direction) => {
     let newMonth = currentMonth + direction;
     let newYear = currentYear;
-    
+
     if (newMonth < 0) {
       newMonth = 11;
       newYear--;
@@ -284,8 +349,11 @@ const MentorSlotScheduler = () => {
 
     setCurrentMonth(newMonth);
     setCurrentYear(newYear);
-    
-    if (selectedDate && (selectedDate.getMonth() !== newMonth || selectedDate.getFullYear() !== newYear)) {
+
+    if (
+      selectedDate &&
+      (selectedDate.getMonth() !== newMonth || selectedDate.getFullYear() !== newYear)
+    ) {
       setSelectedDate(null);
     }
   };
@@ -329,16 +397,8 @@ const MentorSlotScheduler = () => {
       </div>
 
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TimePicker
-          label="Start Time"
-          value={startTime}
-          onChange={setStartTime}
-        />
-        <TimePicker
-          label="End Time"
-          value={endTime}
-          onChange={setEndTime}
-        />
+        <TimePicker label="Start Time" value={startTime} onChange={setStartTime} />
+        <TimePicker label="End Time" value={endTime} onChange={setEndTime} />
       </div>
 
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -373,7 +433,6 @@ const MentorSlotScheduler = () => {
         </div>
       </div>
 
-    
       {errorMsg && <ErrorMessage message={errorMsg} />}
       {successMsg && <SuccessMessage message={successMsg} />}
 
@@ -385,7 +444,6 @@ const MentorSlotScheduler = () => {
       </button>
       <br />
 
-      
       {totalMinutes > 0 && (
         <div className="mb-6">
           <SessionSummary
@@ -397,8 +455,6 @@ const MentorSlotScheduler = () => {
           />
         </div>
       )}
-
-      
     </div>
   );
 };

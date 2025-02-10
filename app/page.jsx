@@ -67,33 +67,31 @@ const PremiumLanding = () => {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <Link href={"http://localhost:3001/StudentDashboard"}>
               <button
-                // onClick={toggleAuthCard}
+                onClick={toggleAuthCard}
                 className={`
                   relative overflow-hidden px-8 sm:px-12 py-3 sm:py-5 bg-white text-black 
                   rounded-full font-medium text-lg transition-all duration-500
                   hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]
                   ${isHovered ? "tracking-widest" : "tracking-wide"}
-                  `}
-                  >
+                `}
+              >
                 <span className="relative z-10">BEGIN YOUR JOURNEY</span>
                 <div
                   className={`
                     absolute inset-0 bg-black transition-transform duration-500
                     ${isHovered ? "translate-y-0" : "translate-y-full"}
-                    `}
-                    />
+                  `}
+                />
                 <span
                   className={`
                     absolute inset-1 flex items-center justify-center text-white 
                     ${isHovered ? "translate-y-0" : "translate-y-full"}
-                    `}
-                    >
+                  `}
+                >
                   SIGNUP
                 </span>
               </button>
-                  </Link>
             </div>
           </div>
         </div>

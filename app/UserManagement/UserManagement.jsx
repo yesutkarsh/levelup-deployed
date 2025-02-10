@@ -21,7 +21,7 @@ const UserManagement = () => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
-        const endpoint = `http://localhost:3001/api/admin/userManagement/${activeTab}`;
+        const endpoint = `/api/admin/userManagement/${activeTab}`;
         const res = await fetch(endpoint);
         
         if (!res.ok) {
@@ -50,7 +50,7 @@ const UserManagement = () => {
     }
     console.log(obj)
     try {
-      const response = await fetch('http://localhost:3001/api/admin/userManagement/approve', {
+      const response = await fetch('/api/admin/userManagement/approve', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const UserManagement = () => {
   // Ban Handler
   const handleBan = async (user) => {
     try {
-      const response = await fetch('http://localhost:3001/api/admin/userManagement/ban', {
+      const response = await fetch('/api/admin/userManagement/ban', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

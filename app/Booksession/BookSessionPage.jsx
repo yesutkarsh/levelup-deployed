@@ -1,46 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Success from './components/Success';
-
-// Define the data structure for session types, mentors, and per-day time slots.
-const sessionOptions = {
-  "Workshop Connect": {
-    mentors: [
-      {
-        name: "Alice Johnson",
-        available: {
-          1: ['09:00', '10:00', '11:00'],
-          2: ['10:00', '11:00', '14:00'],
-          3: ['09:00', '11:00', '15:00'],
-          7: ['14:00', '16:00']
-        }
-      },
-      {
-        name: "Bob Smith",
-        available: {
-          1: ['14:00', '15:00', '16:00'],
-          2: ['09:00', '10:00'],
-          4: ['10:00', '12:00'],
-          5: ['09:00', '11:00']
-        }
-      }
-    ]
-  },
-  "Leadership Connect": {
-    mentors: [
-      {
-        name: "Carol Williams",
-        available: {
-          4: ['09:00', '10:00'],
-          5: ['10:00', '11:00'],
-          6: ['11:00', '12:00'],
-          8: ['13:00', '14:00']
-        }
-      }
-    ]
-  },
-  // Add more session types if needed.
-};
+import Cookies from 'js-cookie';
 
 const SessionCard = ({ logo, title, description }) => {
   return (
@@ -61,34 +22,15 @@ const Calendar = ({
   onTimeSelect, 
   selectedDate, 
   selectedTime,
-  sessionType,
-  selectedMentor,
-  sessionOptions
+  availableApiSlots = [] 
 }) => {
   const year = 2024;
-  const month = 2; // March (month index starts at 0)
+  const month = 2;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startDay = new Date(year, month, 1).getDay();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
   const totalCells = 42;
   const cells = [];
-
-  // Compute available schedule for the chosen session type and mentor (if provided)
-  let availableSchedule = {};
-  if (sessionType && selectedMentor && sessionOptions[sessionType]) {
-    const mentorData = sessionOptions[sessionType].mentors.find(m => m.name === selectedMentor);
-    if (mentorData) {
-      availableSchedule = mentorData.available;
-    }
-  }
-
-  // Build a list of highlighted dates based on available slots from the chosen mentor.
-  const computedHighlightedDates = [];
-  for (let d = 1; d <= daysInMonth; d++) {
-    if (availableSchedule[d]) {
-      computedHighlightedDates.push({ date: d, slots: availableSchedule[d].length });
-    }
-  }
 
   // Fill previous month's cells
   for (let i = startDay - 1; i >= 0; i--) {
@@ -100,11 +42,9 @@ const Calendar = ({
 
   // Fill current month's cells
   for (let d = 1; d <= daysInMonth; d++) {
-    const highlight = computedHighlightedDates.find((item) => item.date === d);
     cells.push({
       day: d,
       currentMonth: true,
-      highlight,
     });
   }
 
@@ -118,27 +58,32 @@ const Calendar = ({
     nextDay++;
   }
 
-  const handleDateSelect = (day, highlight) => {
-    // Only allow date selection if a session type (and mentor, if applicable) is selected
-    if (!sessionType) {
-      alert("Please select session type first.");
+  // Group API slots by date
+  const apiSlotsByDate = {};
+  availableApiSlots.forEach(slot => {
+    const date = new Date(slot.startTime).getDate();
+    if (!apiSlotsByDate[date]) {
+      apiSlotsByDate[date] = [];
+    }
+    apiSlotsByDate[date].push(slot);
+  });
+
+  const handleDateSelect = (day) => {
+    if (!apiSlotsByDate[day]) {
+      alert("No available slots for this date.");
       return;
     }
-    if (sessionOptions[sessionType].mentors.length > 1 && !selectedMentor) {
-      alert("Please select a mentor.");
-      return;
-    }
-    if (highlight) {
-      onDateSelect(day);
-      // Reset time when a new date is selected
-      onTimeSelect('');
-    }
+    onDateSelect(day);
+    onTimeSelect('');
   };
 
-  // Compute available times for the selected date from the mentor's schedule.
+  // Get available times for selected date
   let availableTimes = [];
-  if (selectedDate && sessionType && selectedMentor && availableSchedule[selectedDate]) {
-    availableTimes = availableSchedule[selectedDate];
+  if (selectedDate && apiSlotsByDate[selectedDate]) {
+    availableTimes = apiSlotsByDate[selectedDate].map(slot => ({
+      time: new Date(slot.startTime).toLocaleTimeString(),
+      slot: slot
+    }));
   }
 
   return (
@@ -155,6 +100,8 @@ const Calendar = ({
 
       <div className="grid grid-cols-7 gap-1">
         {cells.map((cell, index) => {
+          const hasApiSlots = apiSlotsByDate[cell.day]?.length > 0;
+          
           if (!cell.currentMonth) {
             return (
               <div key={index} className="p-2 text-gray-400">
@@ -163,18 +110,18 @@ const Calendar = ({
             );
           }
 
-          if (cell.highlight) {
+          if (hasApiSlots) {
             return (
               <div
                 key={index}
-                onClick={() => handleDateSelect(cell.day, cell.highlight)}
+                onClick={() => handleDateSelect(cell.day)}
                 className={`p-2 bg-white rounded-lg cursor-pointer hover:bg-gray-100 ${
                   selectedDate === cell.day ? 'ring-2 ring-black' : ''
                 }`}
               >
                 <span className="block">{cell.day}</span>
                 <span className="text-xs text-gray-600">
-                  {cell.highlight.slots} slot{cell.highlight.slots > 1 ? 's' : ''}
+                  {`${apiSlotsByDate[cell.day].length} slots`}
                 </span>
               </div>
             );
@@ -190,26 +137,25 @@ const Calendar = ({
 
       <div className="mt-6">
         <h3 className="text-lg font-medium mb-4">Available Times</h3>
-        {!sessionType ? (
-          <p className="text-red-500">Please select session type to view available times.</p>
-        ) : (sessionOptions[sessionType].mentors.length > 1 && !selectedMentor) ? (
-          <p className="text-red-500">Please select a mentor to view available times.</p>
-        ) : selectedDate ? (
+        {selectedDate ? (
           availableTimes.length > 0 ? (
             <div className="grid grid-cols-3 gap-2">
-              {availableTimes.map((time) => (
-                <button
-                  key={time}
-                  onClick={() => onTimeSelect(time)}
-                  className={`p-2 rounded-lg text-sm ${
-                    selectedTime === time
-                      ? 'bg-black text-white'
-                      : 'bg-white hover:bg-gray-100'
-                  }`}
-                >
-                  {time}
-                </button>
-              ))}
+              {availableTimes.map((time, index) => {
+                const timeStr = time.time;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => onTimeSelect(time.slot)}
+                    className={`p-2 rounded-lg text-sm ${
+                      selectedTime === time.slot
+                        ? 'bg-black text-white'
+                        : 'bg-white hover:bg-gray-100'
+                    }`}
+                  >
+                    {timeStr}
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <p className="text-gray-600">No available times for selected date.</p>
@@ -225,7 +171,6 @@ const Calendar = ({
 const EmailTagsInput = ({ emails, setEmails }) => {
   const [input, setInput] = useState('');
 
-  // Adds the email if it is non-empty and not already added.
   const addEmail = (email) => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail) return;
@@ -282,54 +227,124 @@ const EmailTagsInput = ({ emails, setEmails }) => {
 };
 
 const BookSessionPage = () => {
-  const [sessionType, setSessionType] = useState('');
-  const [selectedMentor, setSelectedMentor] = useState('');
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [mentorData, setMentorData] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [duration, setDuration] = useState('');
-  const [notes, setNotes] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [attendeeEmails, setAttendeeEmails] = useState([]);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
-  // When the session type changes, auto-select the mentor if there’s only one option.
+  // Fetch courses on component mount
   useEffect(() => {
-    if (sessionType && sessionOptions[sessionType]) {
-      const mentors = sessionOptions[sessionType].mentors;
-      if (mentors.length === 1) {
-        setSelectedMentor(mentors[0].name);
-      } else {
-        setSelectedMentor('');
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch('/api/courses/all');
+        const data = await response.json();
+        console.log('Courses response:', data);
+        if (data.success) {
+          setCourses(data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching courses:', err);
+        setError('Failed to fetch courses');
       }
-      // Reset date and time when session type changes.
-      setSelectedDate(null);
-      setSelectedTime('');
-    } else {
-      setSelectedMentor('');
-      setSelectedDate(null);
-      setSelectedTime('');
-    }
-  }, [sessionType]);
-
-  const handleBooking = (e) => {
-    e.preventDefault();
-    const bookingDetails = {
-      sessionType,
-      mentor: selectedMentor,
-      date: selectedDate ? `March ${selectedDate}, 2024` : null,
-      time: selectedTime,
-      duration,
-      notes,
-      attendeeEmails,
     };
-    console.log('Booking Details:', bookingDetails);
-    setSuccess(true);
+
+    fetchCourses();
+  }, []);
+
+  // Fetch slots when course is selected
+  useEffect(() => {
+    const fetchSlots = async () => {
+      if (!selectedCourse) return;
+
+      try {
+        // Call the internal API route (which proxies the external API)
+        const response = await fetch(`/api/slots?course=${encodeURIComponent(selectedCourse)}`);
+        const data = await response.json();
+        console.log('Slots response:', data);
+        if (data.success && data.data && data.data.length > 0) {
+          setAvailableSlots(data.data[0].currentSlots);
+          setMentorData(data.data[0]);
+        }
+      } catch (err) {
+        console.error('Error fetching slots:', err);
+        setError('Failed to fetch available slots');
+      }
+    };
+
+    fetchSlots();
+  }, [selectedCourse]);
+
+  const handleBooking = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // Get user details from cookie
+      const userDetailsCookie = Cookies.get('userDetails');
+      const userDetails = userDetailsCookie ? JSON.parse(decodeURIComponent(userDetailsCookie)) : null;
+      
+      if (!userDetails) {
+        setError('User details not found');
+        return;
+      }
+      
+      // studentId: userDetails.id,
+      const bookingData = {
+        studentId: '67a92c8c038859d154a38b38',
+        mentorId: mentorData._id,
+        sessionType: "mentor-connect",
+        courseId: selectedCourse,
+        title: title,
+        description: description,
+        joinees: [],
+        startTime: selectedTime.startTime,
+        endTime: selectedTime.endTime
+      };
+  
+      console.log('Sending booking data:', bookingData);
+  
+      // Call the new local API route built with Next.js App Router
+      const response = await fetch('/api/booksession', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+      });
+  
+      const data = await response.json();
+      console.log('Booking response:', data);
+  
+      if (data.success) {
+        setSuccess(true);
+      } else {
+        setError(data.message || 'Booking failed');
+      }
+    } catch (err) {
+      console.error('Error making booking:', err);
+      setError('Failed to make booking');
+    }
   };
+  
 
   return (
     <>
-      {success && <Success date={selectedDate} time={selectedTime} />}
+    {success && <Success date={"Today"} time={"Today"} />}
       <div style={{ backgroundColor: "white" }} className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-6">Book Session</h1>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-6 mb-8">
           <SessionCard
@@ -361,14 +376,30 @@ const BookSessionPage = () => {
 
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-full md:w-1/2">
+            <div className="bg-[#f3f4f6] p-6 rounded-lg mb-6">
+              <label className="block text-gray-700 font-medium mb-2">
+                Select Course
+              </label>
+              <select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                className="w-full p-2 border rounded bg-white"
+              >
+                <option value="">Select a Course</option>
+                {courses.map((course) => (
+                  <option key={course._id} value={course._id}>
+                    {course.courseName} - {course.category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <Calendar
               onDateSelect={setSelectedDate}
               onTimeSelect={setSelectedTime}
               selectedDate={selectedDate}
               selectedTime={selectedTime}
-              sessionType={sessionType}
-              selectedMentor={selectedMentor}
-              sessionOptions={sessionOptions}
+              availableApiSlots={availableSlots}
             />
           </div>
 
@@ -377,70 +408,18 @@ const BookSessionPage = () => {
               <form onSubmit={handleBooking}>
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">
-                    Session Type
-                  </label>
-                  <select
-                    value={sessionType}
-                    onChange={(e) => setSessionType(e.target.value)}
-                    className="w-full p-2 border rounded bg-white"
-                  >
-                    <option value="">Select Session Type</option>
-                    {Object.keys(sessionOptions).map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {sessionType && sessionOptions[sessionType].mentors.length > 1 && (
-                  <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Select Mentor
-                    </label>
-                    <select
-                      value={selectedMentor}
-                      onChange={(e) => setSelectedMentor(e.target.value)}
-                      className="w-full p-2 border rounded bg-white"
-                    >
-                      <option value="">Select Mentor</option>
-                      {sessionOptions[sessionType].mentors.map((mentor) => (
-                        <option key={mentor.name} value={mentor.name}>
-                          {mentor.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {sessionType && sessionOptions[sessionType].mentors.length === 1 && (
-                  <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Mentor
-                    </label>
-                    <input
-                      type="text"
-                      value={selectedMentor}
-                      readOnly
-                      className="w-full p-2 border rounded bg-gray-100"
-                    />
-                  </div>
-                )}
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Date & Time
+                    Selected Time Slot
                   </label>
                   <input
                     type="text"
                     value={
-                      selectedDate && selectedTime
-                        ? `March ${selectedDate}, 2024 at ${selectedTime}`
+                      selectedTime
+                        ? `${new Date(selectedTime.startTime).toLocaleString()} - ${new Date(selectedTime.endTime).toLocaleString()}`
                         : ''
                     }
                     readOnly
-                    placeholder="Select date and time from calendar"
-                    className="w-full p-2 border rounded bg-white"
+                    placeholder="Select time slot from calendar"
+                    className="w-full p-2 border rounded bg-gray-100"
                   />
                 </div>
 
@@ -462,32 +441,46 @@ const BookSessionPage = () => {
 
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Session title"
+                    className="w-full p-2 border rounded bg-white"
+                    required
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Session description"
+                    rows="3"
+                    className="w-full p-2 border rounded bg-white"
+                    required
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
                     Attendee Emails
                   </label>
                   <EmailTagsInput emails={attendeeEmails} setEmails={setAttendeeEmails} />
                 </div>
 
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Notes
-                  </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows="3"
-                    placeholder="Additional notes"
-                    className="w-full p-2 border rounded bg-white"
-                  ></textarea>
-                </div>
-
-                <div>
-                  <button
-                    type="submit"
-                    className="w-full bg-black text-white p-2 rounded hover:bg-gray-800"
-                  >
-                    Confirm Booking
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={!selectedCourse || !selectedTime}
+                  className="w-full bg-black text-white p-2 rounded hover:bg-gray-800 disabled:bg-gray-400"
+                >
+                  Confirm Booking
+                </button>
               </form>
             </div>
           </div>

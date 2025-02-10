@@ -1,9 +1,9 @@
-"use client"
-import React, { useState, useRef } from 'react';
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import UpdateSchedule from './components/UpdateSchedule';
 import MentorDetails from './components/MentorDetails';
+import UpdateSchedule from './components/UpdateSchedule';
 
 export default function MentorDashboard() {
   // Tab state
@@ -21,8 +21,8 @@ export default function MentorDashboard() {
   const [newSkill, setNewSkill] = useState("");
   const fileInputRef = useRef(null);
 
-  // Dummy booked dates for the calendar (days of the month)
-  const bookedDates = [5, 12, 20];
+  // Upcoming Sessions state fetched from our API
+  const [upcomingSessions, setUpcomingSessions] = useState([]);
 
   // Dummy available teachers for session pass
   const availableTeachers = ["Teacher A", "Teacher B", "Teacher C"];
@@ -47,34 +47,73 @@ export default function MentorDashboard() {
     { id: 3, title: "Session 3", date: "2025-02-10", likes: 15, dislikes: 0 },
   ];
 
-  // Handlers for Mentor Details
-  const handleDetailChange = (e) => {
-    setMentorDetails({
-      ...mentorDetails,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // Fetch upcoming sessions from our Next.js API route on mount
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const res = await fetch('/api/sessions/mentor');
+        const result = await res.json();
+        if (result.success && result.data) {
+          setUpcomingSessions(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching sessions:', error);
+      }
+    };
 
-  const handleResumeUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // For demo purposes, we just store the file name.
-      setMentorDetails({
-        ...mentorDetails,
-        resume: file.name,
+    fetchSessions();
+  }, []);
+
+  // Compute booked dates based on the startTime of upcoming sessions
+  const bookedDates = Array.from(
+    new Set(
+      upcomingSessions.map((session) => new Date(session.startTime).getDate())
+    )
+  );
+
+  const handleApprove = async (sessionId) => {
+    const meetingLink = window.prompt(
+      "Enter Zoom or Google Meet link to approve the session:"
+    );
+    if (!meetingLink) return;
+  
+    const payload = {
+      sessionId,             // Session id from your fetched data
+      sessionStatus: "approved",
+      sessionJoinLink: meetingLink,
+    };
+  
+    try {
+      const res = await fetch('/api/session/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-      setResumeFile(file);
+      const data = await res.json();
+      console.log('Session approved successfully:', data);
+    } catch (error) {
+      console.error('Error approving session:', error);
     }
   };
+  
 
-  const handleAddSkill = () => {
-    if (newSkill.trim() !== "") {
-      setMentorDetails({
-        ...mentorDetails,
-        skills: [...mentorDetails.skills, newSkill.trim()],
-      });
-      setNewSkill("");
-    }
+  // Handler for session cancellation
+  const handleCancelClick = (session) => {
+    setSelectedSession(session);
+    setShowCancelModal(true);
+  };
+
+  // Confirm cancellation (here you can add an API call)
+  const handleConfirmCancellation = () => {
+    console.log(
+      "Cancelling session:",
+      selectedSession,
+      "Reason:",
+      cancellationReason
+    );
+    setCancellationReason("");
+    setShowCancelModal(false);
+    setSelectedSession(null);
   };
 
   // Handle schedule form submission
@@ -82,20 +121,6 @@ export default function MentorDashboard() {
     e.preventDefault();
     setScheduleList([...scheduleList, scheduleInput]);
     setScheduleInput({ date: "", day: "", time: "" });
-  };
-
-  // Upcoming sessions: Open cancellation modal
-  const handleCancelClick = (sessionDay) => {
-    setSelectedSession(sessionDay);
-    setShowCancelModal(true);
-  };
-
-  // Confirm cancellation (here you can add an API call)
-  const handleConfirmCancellation = () => {
-    console.log("Cancelling session:", selectedSession, "Reason:", cancellationReason);
-    setCancellationReason("");
-    setShowCancelModal(false);
-    setSelectedSession(null);
   };
 
   return (
@@ -109,7 +134,9 @@ export default function MentorDashboard() {
         />
       </Head>
       <div className="min-h-screen bg-gray-50 p-6">
-        <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Mentor Dashboard</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">
+          Mentor Dashboard
+        </h1>
 
         {/* Tab Navigation */}
         <div className="flex justify-center space-x-6 mb-8 border-b pb-3">
@@ -136,14 +163,16 @@ export default function MentorDashboard() {
         {/* ---------------------- Tab 1: Mentor Details ---------------------- */}
         {activeTab === "details" && (
           <>
-          <MentorDetails/>
+            <MentorDetails />
           </>
         )}
 
         {/* ---------------------- Tab 2: Upcoming Sessions ---------------------- */}
         {activeTab === "sessions" && (
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
-            <h2 className="text-3xl font-semibold mb-6 text-gray-800">Upcoming Sessions</h2>
+            <h2 className="text-3xl font-semibold mb-6 text-gray-800">
+              Upcoming Sessions
+            </h2>
 
             {/* Calendar Display */}
             <div className="grid grid-cols-7 gap-3 mb-8">
@@ -167,42 +196,64 @@ export default function MentorDashboard() {
 
             {/* List of Booked Sessions */}
             <div className="space-y-5">
-              {bookedDates.map((day) => (
-                <div
-                  key={day}
-                  className="flex items-center justify-between p-5 rounded-lg shadow-lg bg-white border border-gray-200 hover:shadow-xl transition"
-                >
-                  <div>
-                    <p className="text-xl font-semibold text-gray-800">
-                      Session on {`February ${day}, 2025`}
-                    </p>
-                    <p className="text-gray-600">Topic: Pear Programming Session</p>
-                    <p className="text-gray-600">Notes: I have doubt in everythign! lamaos </p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                  <button
-                      className="bg-[#328aff] text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+              {upcomingSessions.length > 0 ? (
+                upcomingSessions.map((session) => {
+                  const sessionDate = new Date(session.startTime);
+                  const formattedDate = sessionDate.toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  });
+                  return (
+                    <div
+                      key={session._id}
+                      className="flex items-center justify-between p-5 rounded-lg shadow-lg bg-white border border-gray-200 hover:shadow-xl transition"
                     >
-                      Start Now
-                    </button>
-
-                    <button
-                      onClick={() => handleCancelClick(day)}
-                      className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
-                    >
-                      Cancel
-                    </button>
-                    <select className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-                      <option>Pass Session</option>
-                      {availableTeachers.map((teacher, index) => (
-                        <option key={index} value={teacher}>
-                          {teacher}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              ))}
+                      <div>
+                        <p className="text-xl font-semibold text-gray-800">
+                          Session on {formattedDate}
+                        </p>
+                        <p className="text-gray-600">
+                          Topic: {session.title}
+                        </p>
+                        <p className="text-gray-600">
+                          {session.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        {session.status === "pending" ? (
+                          <button
+                            onClick={() => handleApprove(session._id)}
+                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+                          >
+                            Approve
+                          </button>
+                        ) : (
+                          <button className="bg-[#328aff] text-white px-4 py-2 rounded hover:bg-gray-800 transition">
+                            Start Now
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleCancelClick(session)}
+                          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+                        >
+                          Cancel
+                        </button>
+                        <select className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                          <option>Pass Session</option>
+                          {availableTeachers.map((teacher, index) => (
+                            <option key={index} value={teacher}>
+                              {teacher}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-gray-600">No upcoming sessions found.</p>
+              )}
             </div>
           </div>
         )}
@@ -210,14 +261,16 @@ export default function MentorDashboard() {
         {/* ---------------------- Tab 3: Update Schedule ---------------------- */}
         {activeTab === "schedule" && (
           <>
-          <UpdateSchedule/>
+            <UpdateSchedule />
           </>
         )}
 
         {/* ---------------------- Tab 4: Analytics ---------------------- */}
         {activeTab === "analytics" && (
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
-            <h2 className="text-3xl font-semibold mb-6 text-gray-800">Analytics</h2>
+            <h2 className="text-3xl font-semibold mb-6 text-gray-800">
+              Analytics
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sessionAnalytics.map((session) => (
                 <div
@@ -231,17 +284,21 @@ export default function MentorDashboard() {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       <i className="ri-thumb-up-line text-green-600 text-xl"></i>
-                      <span className="font-medium text-gray-700">{session.likes}</span>
+                      <span className="font-medium text-gray-700">
+                        {session.likes}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <i className="ri-thumb-down-line text-red-600 text-xl"></i>
-                      <span className="font-medium text-gray-700">{session.dislikes}</span>
+                      <span className="font-medium text-gray-700">
+                        {session.dislikes}
+                      </span>
                     </div>
                   </div>
                   <Link href={"/Booksession/PostSessionMentor"}>
-                  <button className="mt-4 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition">
-                    View Review
-                  </button>
+                    <button className="mt-4 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition">
+                      View Review
+                    </button>
                   </Link>
                 </div>
               ))}
@@ -255,7 +312,12 @@ export default function MentorDashboard() {
             <div className="bg-white p-8 rounded-lg shadow-2xl w-96">
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">
                 Cancel Session on{" "}
-                {selectedSession && `February ${selectedSession}, 2025`}
+                {selectedSession &&
+                  new Date(selectedSession.startTime).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
               </h2>
               <textarea
                 placeholder="Reason for cancellation"

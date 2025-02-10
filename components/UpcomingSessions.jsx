@@ -1,65 +1,72 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Laptop, Database } from 'lucide-react';
 
-// Updated data arrays with status:
-// - "active": session is joinable now (shows "Join Now")
-// - "future": session is scheduled for later (dimmed, shows "Ratings" and "View Details")
-// - "past": completed session (only shown in the modal under Past tab)
-const upcomingSessions = [
-  {
-    id: 1,
-    title: "Pair Programming with Jane",
-    time: "Today, 10:00 AM",
-    status: "active", // joinable now
-  },
-  {
-    id: 2,
-    title: "Code Review Session",
-    time: "Today, 2:00 PM",
-    status: "future", // future meeting (dimmed)
-  },
-  {
-    id: 3,
-    title: "Debugging Workshop",
-    time: "Today, 4:00 PM",
-    status: "active", // joinable now
-  },
-];
-
-const pastSessions = [
-  {
-    id: 4,
-    title: "Retrospective Meeting",
-    time: "Yesterday, 3:00 PM",
-    status: "past",
-  },
-  {
-    id: 5,
-    title: "Sprint Planning",
-    time: "Last week, 11:00 AM",
-    status: "past",
-  },
-];
-
 export default function UpcomingSessions() {
+  const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [pastSessions, setPastSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('upcoming'); // "upcoming" or "past"
 
+  useEffect(() => {
+    async function fetchSessions() {
+      try {
+        // Call our internal API route
+        const res = await fetch('/api/sessions/student');
+        if (!res.ok) {
+          throw new Error('Failed to fetch sessions');
+        }
+        const json = await res.json();
+
+        // Extract bookedSessions from the API response.
+        // If bookedSessions is not present or empty, we simply set an empty array.
+        const sessions = json.data.bookedSessions || [];
+        setUpcomingSessions(sessions);
+
+        // For past sessions, you can either fetch from another endpoint or keep a hardcoded example.
+        // Here, we use a hardcoded fallback.
+        setPastSessions([
+          {
+            id: 4,
+            title: "Retrospective Meeting",
+            time: "Yesterday, 3:00 PM",
+            status: "past",
+          },
+          {
+            id: 5,
+            title: "Sprint Planning",
+            time: "Last week, 11:00 AM",
+            status: "past",
+          },
+        ]);
+
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+        setLoading(false);
+      }
+    }
+
+    fetchSessions();
+  }, []);
+
   // Handler for Ratings button click
   const handleRatingClick = () => {
-    // Redirect to the required page
     window.location.href = '/Booksession/PostSessionStudent';
   };
 
-  // Render a session card based on its status
+  // Render a session card based on its status.
+  // Uses session._id as a key if available.
   const renderSessionCard = (session) => {
     // Dim the card if the session is scheduled for the future.
     const isDimmed = session.status === 'future';
 
     return (
       <div
-        key={session.id}
+        key={session._id || session.id}
         className={`flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all duration-200 ${
           isDimmed ? 'opacity-50' : ''
         }`}
@@ -98,6 +105,9 @@ export default function UpcomingSessions() {
     );
   };
 
+  if (loading) return <div>Loading sessions...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <div className="bg-white rounded-lg shadow relative">
       <div className="p-6">
@@ -111,7 +121,11 @@ export default function UpcomingSessions() {
           </button>
         </div>
         <div className="space-y-4">
-          {upcomingSessions.map((session) => renderSessionCard(session))}
+          {upcomingSessions.length > 0 ? (
+            upcomingSessions.map((session) => renderSessionCard(session))
+          ) : (
+            <div className="text-sm text-gray-500">No sessions booked</div>
+          )}
         </div>
       </div>
 
@@ -157,9 +171,15 @@ export default function UpcomingSessions() {
 
             {/* Tab Content */}
             <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
-              {activeTab === 'upcoming'
-                ? upcomingSessions.map((session) => renderSessionCard(session))
-                : pastSessions.map((session) => renderSessionCard(session))}
+              {activeTab === 'upcoming' ? (
+                upcomingSessions.length > 0 ? (
+                  upcomingSessions.map((session) => renderSessionCard(session))
+                ) : (
+                  <div className="text-sm text-gray-500">No sessions booked</div>
+                )
+              ) : (
+                pastSessions.map((session) => renderSessionCard(session))
+              )}
             </div>
           </div>
         </div>

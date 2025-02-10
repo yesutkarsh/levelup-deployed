@@ -80,7 +80,7 @@ export async function POST(request) {
     // Set user details in an unencrypted cookie
     // Remove sensitive information before storing
     const userForCookie = {
-      id: userDetails.id,
+      id: userDetails._id,
       name: userDetails.name,
       email: userDetails.email,
       role: userDetails.role,
