@@ -1,4 +1,4 @@
-export async function POST(req) {
+export async function POST() {
     try {
       const response = new Response(JSON.stringify({ message: 'Logged out successfully' }), {
         headers: {
