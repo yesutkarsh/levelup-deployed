@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Cookies from 'js-cookie';
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -113,42 +112,37 @@ export default function Navbar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 
-  const handleLogout = () => {
-    // List of cookies to delete
-    const cookiesToDelete = [
-      'accessToken',
-      'refreshToken',
-      'userDetails',
-      'role'
-    ];
+  const handleLogout = async () => {
+    try {
+      // 1. First, clear HTTP-only cookies via API call
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include', // Important for cookies
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
   
-    // Delete specific cookies using js-cookie
-    cookiesToDelete.forEach(cookieName => {
-      // Remove cookie for all paths
-      Cookies.remove(cookieName, { path: '/' });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+  
+      // 2. Clear non-HTTP-only cookies
+      Cookies.remove('userDetails', { path: '/' });
       
-      // If your cookies are set with different domains or paths, 
-      // you might need to specify those:
-      // Cookies.remove(cookieName, { path: '/', domain: '.yourdomain.com' });
-    });
+      // Start logout animation
+      setIsLoggingOut(true);
+      setShowLogoutModal(false);
   
-    // If you're using HTTP-only cookies set by the server,
-    // you'll need to call an API endpoint to clear them
-    fetch('/api/logout', {
-      method: 'POST',
-      credentials: 'include', // Important for cookies
-    }).catch(error => {
-      console.error('Logout API error:', error);
-    });
+      // Redirect after animation
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
   
-    // Start logout animation
-    setIsLoggingOut(true);
-    setShowLogoutModal(false);
-  
-    // Redirect after animation
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 2000);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Handle error appropriately
+    }
   };
   return (
     <>
