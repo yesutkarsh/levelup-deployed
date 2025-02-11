@@ -23,7 +23,7 @@ export async function GET(request) {
     const userId = userDetails.id;
 
     // Construct the external API URL using the user id
-    const apiUrl = `http://5c93-2402-a00-166-1023-4d6d-24c2-49dc-fe9.ngrok-free.app/api/v1/mentor/get-upcoming-sessions/${userId}`;
+    const apiUrl = process.env.BASEURL+`/api/v1/mentor/get-upcoming-sessions/${userId}`;
 
     // Fetch data from the external API
     const res = await fetch(apiUrl);

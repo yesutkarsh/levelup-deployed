@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 export async function GET() {
   // Synchronously get cookies (no await needed)
   const cookieStore = cookies();
-  const userDetailsCookie = cookieStore.get('userDetails');
+  const userDetailsCookie = await cookieStore.get('userDetails');
 
   if (!userDetailsCookie) {
     return NextResponse.json(

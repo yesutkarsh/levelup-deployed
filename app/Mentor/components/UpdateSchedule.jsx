@@ -307,7 +307,8 @@ const MentorSlotScheduler = () => {
       return;
     }
     const mentorId = userDetails.id;
-    const apiUrl = process.env.BASEURL+`/api/v1/mentor/create-slot/${mentorId}`;
+    const apiUrl = `https://levelup-server-vercel.onrender.com/api/v1/mentor/create-slot/${mentorId}`;
+    console.log(process.env.BASEURL)
 
     // Log the API URL and payload.
     console.log("API URL:", apiUrl);

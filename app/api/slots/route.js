@@ -19,6 +19,7 @@ export async function GET(request) {
       process.env.BASEURL+`/api/v1/student/get-slots-by-course/${selectedCourse}`
     );
 
+
     // If the external API returns an error status, forward it
     if (!externalResponse.ok) {
       return NextResponse.json(

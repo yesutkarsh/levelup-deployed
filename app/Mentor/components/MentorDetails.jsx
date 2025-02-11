@@ -132,7 +132,7 @@ export default function MentorDetails() {
 
       console.log(requestBody)
 
-      const response = await fetch(process.env.BASEURL+'/api/v1/mentor/profile-setup', {
+      const response = await fetch('/api/mentor/profilesetup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

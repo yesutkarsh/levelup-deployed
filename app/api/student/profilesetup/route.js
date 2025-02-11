@@ -43,7 +43,7 @@ export async function POST(request) {
     };
 
     // Make the request to the exact ngrok URL
-    const externalRes = await fetch("http://5c93-2402-a00-166-1023-4d6d-24c2-49dc-fe9.ngrok-free.app/api/v1/student/profile-setup", {
+    const externalRes = await fetch(process.env.BASEURL+"/api/v1/student/profile-setup", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
