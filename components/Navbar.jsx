@@ -1,33 +1,12 @@
 "use client";
 
-import { Search, Bell } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { useProfile } from '@/context/ProfileContext';
 
 export default function Navbar() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
   const { profileImage } = useProfile();
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    
-    // Mock search results - replace with actual search logic
-    const mockResults = [
-      { id: 1, title: 'Advanced Algorithms', type: 'Course' },
-      { id: 2, title: 'Database Systems', type: 'Course' },
-      { id: 3, title: 'Web Development', type: 'Resource' },
-    ].filter(item => 
-      item.title.toLowerCase().includes(query.toLowerCase())
-    );
-    
-    setSearchResults(mockResults);
-    setShowResults(query.length > 0);
-  };
-
+ 
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,27 +53,7 @@ export default function Navbar() {
               <div className="relative">
                 
                 
-                {showResults && (
-                  <div className="absolute mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                    {searchResults.length > 0 ? (
-                      <div className="py-2">
-                        {searchResults.map((result) => (
-                          <div
-                            key={result.id}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                          >
-                            <div className="text-sm text-gray-900">{result.title}</div>
-                            <div className="text-xs text-gray-500">{result.type}</div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="px-4 py-2 text-sm text-gray-700">
-                        No results found
-                      </div>
-                    )}
-                  </div>
-                )}
+               
               </div>
             </div>
             <div className="ml-4 flex items-center">

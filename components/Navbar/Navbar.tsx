@@ -127,8 +127,6 @@ export default function Navbar() {
         throw new Error('Logout failed');
       }
   
-      // 2. Clear non-HTTP-only cookies
-      Cookies.remove('userDetails', { path: '/' });
       
       // Start logout animation
       setIsLoggingOut(true);
