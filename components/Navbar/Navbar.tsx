@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import Cookies from 'js-cookie';
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -110,24 +112,44 @@ export default function Navbar() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = () => {
-    // Clear all cookies
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
-    });
 
+  const handleLogout = () => {
+    // List of cookies to delete
+    const cookiesToDelete = [
+      'accessToken',
+      'refreshToken',
+      'userDetails',
+      'role'
+    ];
+  
+    // Delete specific cookies using js-cookie
+    cookiesToDelete.forEach(cookieName => {
+      // Remove cookie for all paths
+      Cookies.remove(cookieName, { path: '/' });
+      
+      // If your cookies are set with different domains or paths, 
+      // you might need to specify those:
+      // Cookies.remove(cookieName, { path: '/', domain: '.yourdomain.com' });
+    });
+  
+    // If you're using HTTP-only cookies set by the server,
+    // you'll need to call an API endpoint to clear them
+    fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'include', // Important for cookies
+    }).catch(error => {
+      console.error('Logout API error:', error);
+    });
+  
     // Start logout animation
     setIsLoggingOut(true);
     setShowLogoutModal(false);
-
+  
     // Redirect after animation
     setTimeout(() => {
       window.location.href = "/";
     }, 2000);
   };
-
   return (
     <>
       {/* Top Navbar */}
