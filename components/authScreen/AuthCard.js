@@ -189,7 +189,7 @@ export default function AuthCard() {
       //   setPasswordError("Password is not strong enough.");
       //   return;
       // }
-      Register({ name, phoneNumber, email, password, registerType });
+      Register({ name, phoneNumber, email, password });
     } else if (activeTab === "forgot") {
       if (!validateEmail(email)) {
         setEmailError("Please enter a valid email address.");
